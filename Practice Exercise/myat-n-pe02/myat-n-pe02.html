@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Greeter</title>
+    <style>
+      *{font-size:1.5em;}
+    </style>
+    <script>
+    "use strict";
+    window.onload = init; // need to move this as it is not loaded logically
+    function DoThis(){
+        if(true){
+            if(true){
+                for(var i=0; i<5;i++)
+                    var a=10;
+            }
+        }
+        
+    }
+    Console.Log("Log end:",a,1); //What will happen? - Think scope!
+
+    function sayGoodbye(){
+        let firstName = document.querySelector("#input-firstname").value;
+        firstName = firstName.trim() || "Peter";
+    }
+    function sayHello(){
+        let firstName = document.querySelector("#input-firstname").value;
+        firstName = firstName.trim() || "Peter";
+
+        let lastName = document.querySelector("#input-lastname")/value;
+        lastName = lastName.trim() || "Parker";
+
+        document.querySelector("#output").innerHTML = `Hello ${firstName} ${lastName}`;
+    }
+    sayHello();
+    sayGoodbye();
+    </script>
+  </head>
+<body>
+  <!-- <button>Click Me!</button> -->
+  <input id="input-firstname" placeholder="First Name">
+  <input id="input-lastname" placeholder="Last Name">
+  <p id="output">???</p>
+</body>
+</html>
