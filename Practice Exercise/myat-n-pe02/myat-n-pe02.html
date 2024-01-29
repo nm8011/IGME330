@@ -3,44 +3,92 @@
   <head>
     <meta charset="utf-8" />
     <title>Greeter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Lemon&amp;display=swap" rel="stylesheet">
     <style>
-      *{font-size:1.5em;}
+        * {
+            font-size: 1.5em;
+            font-family: "Lemon", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        button {
+            height: 50px;
+            width: 200px; /*150px does not fit words*/
+            font-size: 14pt;
+        }
+        input[type=checkbox]{
+            transform: scale(2);
+        }
+        label{
+            font-size: 24px;
+        }
+        #btnDiv{
+            border-bottom: thick solid black;
+            padding-bottom: 25px;
+        }
+
+
+        @media only screen and (min-width: 1024px){
+            body{
+            background-color: red;
+            padding: 100px;
+        }
+        }
     </style>
     <script>
     "use strict";
-    window.onload = init; // need to move this as it is not loaded logically
-    function DoThis(){
-        if(true){
-            if(true){
-                for(var i=0; i<5;i++)
-                    var a=10;
-            }
-        }
-        
+// 1 - get a reference to the button
+// 2 - add a click event to button that calls a `sayHello` function
+// 3 - create a `sayHello()` function
+// 3A - get name of person from the <input>
+// 3B - get a reference to the #output <p>
+// 3C - update HTML of #output <p>
+function greet(greeting) {
+    let firstName = document.querySelector("#input-firstname").value;
+    let lastName = document.querySelector("#input-lastname").value;
+    if (!firstName.trim()) firstName = "Peter";
+    if (!lastName.trim()) lastName = "Parker";
+    let isShoutify = isChecked();
+    if(isChecked == true)
+    {
+        document.querySelector("#output").innerHTML = `isWorking`
     }
-    Console.Log("Log end:",a,1); //What will happen? - Think scope!
-
-    function sayGoodbye(){
-        let firstName = document.querySelector("#input-firstname").value;
-        firstName = firstName.trim() || "Peter";
+    else{
+        document.querySelector("#output").innerHTML = `${greeting} ${firstName} ${lastName}`
     }
-    function sayHello(){
-        let firstName = document.querySelector("#input-firstname").value;
-        firstName = firstName.trim() || "Peter";
-
-        let lastName = document.querySelector("#input-lastname")/value;
-        lastName = lastName.trim() || "Parker";
-
-        document.querySelector("#output").innerHTML = `Hello ${firstName} ${lastName}`;
+}
+function isChecked(){
+    if(document.getElementById('shoutify').checked){
+        return true;
     }
-    sayHello();
-    sayGoodbye();
+    else{
+        return false;
+    }
+}
+
+function init() {
+    const button = document.querySelector("button");
+    const button2 = document.querySelector("#btn-Click2");
+    // button.onclick = sayHello;
+    button.addEventListener("click", () => {greet("Hello")});
+    button2.addEventListener("click", () => {greet("Bye")});
+    document.querySelector("#output").style.color = "red";
+    document.querySelector("#output").style.backgroundColor = "yellow";
+}
+window.onload = init;
     </script>
   </head>
 <body>
-  <!-- <button>Click Me!</button> -->
-  <input id="input-firstname" placeholder="First Name">
-  <input id="input-lastname" placeholder="Last Name">
-  <p id="output">???</p>
+    <div id="btnDiv">
+        <button>Say Hello</button>
+        <button id="btn-Click2">Say Goodbye</button>
+        <input type="checkbox" id="shoutify"/>
+        <label for="shoutify">Shoutify!</label>
+    </div>
+        <input id="input-firstname" placeholder="First Name">
+        <input id="input-lastname" placeholder="Last Name">
+    <p id="output" style="color: red; background-color: yellow;"></p>
 </body>
 </html>
