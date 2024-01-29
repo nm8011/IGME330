@@ -13,7 +13,9 @@
             font-weight: 400;
             font-style: normal;
         }
-        button {
+        /*Declaratively (using CSS) make the button 50 pixels tall by 
+        150 pixels wide, with a font-size of 14 points*/
+        button{
             height: 50px;
             width: 200px; /*150px does not fit words*/
             font-size: 14pt;
@@ -25,11 +27,15 @@
             font-size: 24px;
         }
         #btnDiv{
-            border-bottom: thick solid black;
+            border-bottom: thick solid grey;
             padding-bottom: 25px;
         }
-
-
+        div{
+            padding-top: 25px;
+        }
+        /*Add a media query that kicks in at 1024px or wider:
+        it gives the <body> a background-color of red
+        it gives the <body> 100 pixels of padding*/
         @media only screen and (min-width: 1024px){
             body{
             background-color: red;
@@ -37,57 +43,61 @@
         }
         }
     </style>
+    <!--Move the <script>...</script> tag back up to the <head> section -->
     <script>
     "use strict";
+//Greeter1
 // 1 - get a reference to the button
 // 2 - add a click event to button that calls a `sayHello` function
 // 3 - create a `sayHello()` function
 // 3A - get name of person from the <input>
 // 3B - get a reference to the #output <p>
 // 3C - update HTML of #output <p>
-function greet(greeting) {
+
+//4. Can you get rid of sayHello() and sayGoodbye() and have each button call a single 
+//function named greet(), that takes a greeting parameter 
+//Changes the output based on the names inputted
+const greet = (greeting) =>{
     let firstName = document.querySelector("#input-firstname").value;
     let lastName = document.querySelector("#input-lastname").value;
+    //2. If the user does not enter any text into the <input>, then use a default of "Peter" for the first name
+    //2.  use String.trim() to get rid of any leading or trailing spaces that the user might have typed in
     if (!firstName.trim()) firstName = "Peter";
+    //4. Write code that uses a default of "Parker" for the last name if one is not typed in
     if (!lastName.trim()) lastName = "Parker";
-    let isShoutify = isChecked();
-    if(isChecked == true)
-    {
-        document.querySelector("#output").innerHTML = `isWorking`
-    }
-    else{
-        document.querySelector("#output").innerHTML = `${greeting} ${firstName} ${lastName}`
-    }
-}
-function isChecked(){
-    if(document.getElementById('shoutify').checked){
-        return true;
-    }
-    else{
-        return false;
-    }
-}
+    document.querySelector("#output").innerHTML = `${greeting} ${firstName} ${lastName}!`
 
-function init() {
-    const button = document.querySelector("button");
-    const button2 = document.querySelector("#btn-Click2");
+    //Make the string ouput statement all caps if shoutify checkbox is checked
+    if(document.querySelector("#shoutify").checked){
+        let string = document.querySelector("#output").innerHTML;
+        document.querySelector("#output").innerHTML = string.toUpperCase();
+    }
+}
+const init = () => {
+    const button = document.querySelector("#btn-hello");
+    const button2 = document.querySelector("#btn-goodbye");
     // button.onclick = sayHello;
     button.addEventListener("click", () => {greet("Hello")});
     button2.addEventListener("click", () => {greet("Bye")});
     document.querySelector("#output").style.color = "red";
     document.querySelector("#output").style.backgroundColor = "yellow";
 }
+// use window.onload or window.addEventListener() to detect when the page has loaded
 window.onload = init;
     </script>
   </head>
 <body>
     <div id="btnDiv">
-        <button>Say Hello</button>
-        <button id="btn-Click2">Say Goodbye</button>
+        <!-- 4. Give the buttons id values (in the HTML) of "btn-hello" and "btn-goodbye"-->
+        <button id="btn-hello">Say Hello</button>
+        <!-- 4. Add a new button named "Say Goodbye" that will display "Goodbye " (instead of "Hello ") when it is clicked-->
+        <button id="btn-goodbye">Say Goodbye</button>
         <input type="checkbox" id="shoutify"/>
         <label for="shoutify">Shoutify!</label>
     </div>
+    <div></div>
         <input id="input-firstname" placeholder="First Name">
+        <!-- 4. Add a "last name" <input> so that we can greet the person using both their first and last names-->
         <input id="input-lastname" placeholder="Last Name">
     <p id="output" style="color: red; background-color: yellow;"></p>
 </body>
