@@ -1,0 +1,2 @@
+For this assignment you will be building a mobile-friendly "Technobabble" generator, in 2 parts
+Note: After the due date, we will continue to work on this and be refactoring this in class, and your first HW assignment will be using this exercise as the starting point
