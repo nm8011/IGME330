@@ -4,10 +4,13 @@ body{
 #output{
     font-size: 300%;
 }
-#myButton{
+#btn-gen-1{
     width: 200px;
     height: 50pt;
     font-size: 15pt;
+}
+#btn-gen-5{
+    display: none;
 }
 h1{
     font-family: "Sofia", sans-serif;
@@ -21,7 +24,7 @@ h1{
     body{
         text-align: center;
     }
-    #myButton{
+    #btn-gen-1{
         height: 90pt;
         width: 200px;
         font-size: 1.7rem;
@@ -54,7 +57,7 @@ h1{
         font-size: 3rem;
         background-color: #23D160;
     }
-    #myButton{
+    #btn-gen-1{
         width: 300px;
         height: 75pt;
         font-size: 1.5rem;
@@ -79,4 +82,16 @@ h1{
     #output{
         text-align: left;
     }
+}
+/* Button will only appear on 1408px */
+@media only screen and (min-width: 1408px){
+#btn-gen-5{
+    display: inline;
+    width: 300px;
+    height: 75pt;
+    font-size: 1.5rem;
+}
+h1{
+    background-color:burlywood;
+}
 }
