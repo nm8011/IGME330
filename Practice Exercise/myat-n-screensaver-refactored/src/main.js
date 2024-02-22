@@ -5,8 +5,8 @@ let oneIteration = 1;
 let createRectangles = true;
 let createCircles = true;
 let createLines = true;
-// import { getRandomColor, getRandomInt } from './utils.js';
-
+import { getRandomColor, getRandomInt } from './utils.js';
+import { drawRectangle,drawLine,drawArc } from './canvas-untils.js';
 let init = () =>{
     console.log("page loaded!");
     
@@ -65,55 +65,6 @@ let canvasClicked = (e) => {
   }
 }
 
-//canvas helper
-let drawRectangle = (ctx,x,y,width,height,fillStyle="black",lineWidth=0,strokeStyle="black") => {
-  ctx.save();
-  ctx.fillStyle = fillStyle;
-  ctx.beginPath();
-  ctx.rect(x,y,width,height);
-  ctx.fill();
-  if(lineWidth > 0)
-  {
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = strokeStyle;
-    ctx.stroke();
-  }
-  ctx.closePath();
-  ctx.restore();
-}
-
-let drawArc = (ctx,x,y,radius,fillStyle="black",lineWidth=0,strokeStyle="black",startAngle=0,endAngle=Math.PI*2) => {
-  ctx.save();
-  ctx.fillStyle = fillStyle;
-  ctx.beginPath();
-  ctx.arc(x,y,radius,startAngle,endAngle,false);
-  ctx.fill();
-  if(lineWidth > 0)
-  {
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = strokeStyle;
-    ctx.stroke();
-  }
-  ctx.closePath();
-  ctx.restore();
-}
-
-let drawLine = (ctx,x1,y1,x2,y2,lineWidth=1,strokeStyle="black") =>{
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.lineTo(x2,y2);
-  ctx.fill();
-  if(lineWidth > 0)
-  {
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = strokeStyle;
-    ctx.stroke();
-  }
-  ctx.closePath();
-  ctx.restore();     
-}
-
 //draw random
 let drawRandomRect = (ctx) =>{
     drawRectangle(ctx,getRandomInt(0,640),getRandomInt(0,480),getRandomInt(10,90),getRandomInt(10,90),getRandomColor(),getRandomInt(2,12),getRandomColor());
@@ -159,14 +110,3 @@ let setupUI = () =>{
   }
 }
 init();
-
-let getRandomColor = () =>{
-    let getByte = () =>{
-      return 55 + Math.round(Math.random() * 200);
-    }
-    return `rgba(${getByte()},${getByte()},${getByte()},.8)`;
-  }
-  
-  let getRandomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
