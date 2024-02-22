@@ -6,7 +6,7 @@
 	<style>canvas{ border: 1px solid black; }</style>
 	<script>
 	"use strict";
-	const canvasWidth = 800, canvasHeight = 600;
+	const canvasWidth = 400, canvasHeight = 300;
 	let ctx;
     let n = 0;
     let c = 4;
@@ -58,8 +58,8 @@
         drawCircle(ctx,x,y,2,color);
 
         n++;
-        if(x > canvasWidth)restartApp();
-        if(divergence > 200) divergence = 137.1;
+        if(x > 400)restartApp();
+        if(divergence > 140) divergence = 137.1;
         if(c < -8) c= 4;
     }
 
@@ -73,11 +73,12 @@
         for(let i=0; i<15; i++)
         {
         let a = i * dtr(divergence);
-        let r = 4 * Math.sqrt(i);
+        let r = c * Math.sqrt(i);
         mouseX += r * Math.cos(a);
         mouseY += r * Math.sin(a);
         drawCircle(ctx,mouseX,mouseY,2,color);
         }
+       
     }
 
     //Reset
@@ -103,22 +104,6 @@
 	}
 
 	</script>
-    <style>
-        li{
-            font-size: 24px;
-        }
-        label{
-            font-size: 36px;
-        }
-        select{
-            font-size: 36px;
-        }
-        button{
-            font-size: 36px;
-        }
-
-    </style>
-
 </head>
 <body>
 <canvas id="canvas"></canvas>
@@ -133,21 +118,5 @@
 	</select>
 	<button id="btn-restart">Restart App</button>
 </div>
-<h1>About this app</h1>
-<ul>
-    <li>The pulldown menu above allows the user to change the divergence angle</li>
-    <li>The "Restart App" button will restore the app to it n=0 state while maintaining the petal size and padding values</li>
-    <li>Changes made from the starter code
-        <ul>
-            <li>Increment the frame rate to 1000 FPS</li>
-            <li>Increased canvas size to 800x600 pixels</li>
-            <li>Decrement padding values to create unique flower</li>
-            <li>Increment diversion value to create unique flower</li>
-            <li>Click anywhere on canvas to create a flower</li>
-            <li>Reset drawing when x exceeds width of canvas</li>
-            <li>Revert padding values and divergence when exceed certain value</li>
-        </ul>
-    </li>
-</ul>
 </body>
 </html>
