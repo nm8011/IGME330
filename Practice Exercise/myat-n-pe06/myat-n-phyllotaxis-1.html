@@ -11,7 +11,7 @@
     let n = 0;
     let c = 4;
     let divergence = 137.5;
-
+    let randNum;
     window.onload = init;
 	function init(){
 		ctx = canvas.getContext("2d");
@@ -21,6 +21,14 @@
         console.log("For #2: I deincremented the 'c' and incremented the 'divergence' by 0.001 per frame")
         document.querySelector("#btn-restart").onclick = restartApp;
 
+        //change based on selected option
+        let selectElement = document.querySelector("#ctrl-divergence");
+        divergence = parseInt(selectElement.value, 10);
+        
+        selectElement.addEventListener('change', function() {
+            divergence = parseInt(this.value, 10);
+            console.log(divergence);
+        });
         loop();
 
         canvas.onclick = drawFlower;
@@ -62,17 +70,14 @@
         console.log(mouseX,mouseY);
         let color = `hsl(${n/5 % 361},100%,50%)`;
 
-        for(let i=0; i<2000; i++)
+        for(let i=0; i<15; i++)
         {
-        let a = n * dtr(divergence);
-        let r = c * Math.sqrt(n);
-        mouseX += r * Math.cos(a) + canvasWidth/2;
-        mouseY += r * Math.sin(a) + canvasHeight/2;
-            drawCircle(ctx,mouseX,mouseY,2,color);
+        let a = i * dtr(divergence);
+        let r = c * Math.sqrt(i);
+        mouseX += r * Math.cos(a);
+        mouseY += r * Math.sin(a);
+        drawCircle(ctx,mouseX,mouseY,2,color);
         }
-
-        
-
        
     }
 
