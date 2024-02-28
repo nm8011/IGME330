@@ -5,41 +5,39 @@
 	<title>Phyllo-Classy Start</title>
 	<style>canvas{ border: 1px solid black; }</style>
 	<script>
-	
-	"use strict";
+
 	const canvasWidth = 640, canvasHeight = 480;
 	let n = 0;
 	const divergence = 137.5;
 	const c = 4;
 	
 	let ctx;
+	let flowerLeft;
+	let flowerRight;
+	let spriteArray;
 
-	function init(){
-		ctx = canvas.getContext("2d");
-		canvas.width = canvasWidth;
-		canvas.height = canvasHeight;
-		ctx.fillRect(0,0,canvasWidth,canvasHeight);
-		loop();
-	}
-	
-	function loop(){
-                setTimeout(loop,1000/30);
-		let a = n * dtr(divergence);
-		let r = c * Math.sqrt(n);
-		let x = r * Math.cos(a) + canvasWidth/2;
-		let y = r * Math.sin(a) + canvasHeight/2;
-		let color = `hsl(${n/5 % 361},100%,50%)`;
-		drawCircle(ctx,x,y,2,color);
-                n++;
-	}
+	class PhylloFlower{
+		constructor(n=0, centerX=0, centerY=0, divergence=137.5, c=4, fps=30){
+			this.n = 0; //n should be initialized to 0 in your constructor
+			//The values of the other 4 properties must be passed into the constructor as parameters
+			this.centerX = centerX;
+			this.centerY = centerY;
+			this.divergence = divergence;
+			this.c = c;
+			this.fps = fps;
+		}
 
+		draw(ctx){	//a draw() method that takes a ctx argument
+			let angle = this.n * this.dtr(this.divergence);
+			let radius = this.c * Math.sqrt(this.n);
+			let x = radius * Math.cos(angle) + this.centerX;
+			let y = radius * Math.sin(angle) + this.centerY;
+			let color = `hsl(${this.n/5 % 361},100%,50%)`;
+			this.drawCircle(ctx,x,y,2,color);
+			this.n++;
+		}
 
-	// helpers
-	function dtr(degrees){
-		return degrees * (Math.PI/180);
-	}
-
-	function drawCircle(ctx,x,y,radius,color){
+		drawCircle(ctx,x,y,radius,color){
 		ctx.save();
 		ctx.fillStyle = color;
 		ctx.beginPath();
@@ -47,10 +45,33 @@
 		ctx.closePath();
 		ctx.fill();
 		ctx.restore();
+		}
+
+		dtr(degrees){ return degrees * (Math.PI/180);}
+	}
+
+	function init(){
+		ctx = canvas.getContext("2d");
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
+		ctx.fillRect(0,0,canvasWidth,canvasHeight);
+		flowerLeft = new PhylloFlower(0, 200, 200, 137.5, 4, 30);
+		flowerRight = new PhylloFlower(0, 450, 200, 137.1, 3, 100);
+		spriteArray = [flowerLeft,flowerRight];
+		for(let i = 0; i < spriteArray.length; i++)
+		{
+			loop(spriteArray[i], spriteArray[i].fps);
+		}
+	}
+	
+	//pass in object and fps that the objects get drawn 
+	function loop(flower, fps){
+		// setTimeout(loop,1000/fps); //doesnt work cuz of argument
+		setTimeout(() => loop(flower,fps),1000/fps);
+		flower.draw(ctx);
 	}
 	
 	window.onload = init;
-
 	</script>
 </head>
 <body>
