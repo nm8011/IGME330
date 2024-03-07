@@ -2,36 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Audio Visualizer</title>
+  <title id="title">?</title>
   <link href="./styles/default-styles.css" type="text/css" rel="stylesheet" />
   <script src="./src/loader.js" type="module"></script>
 </head>
 <body>
 <main>
+  <h1 id="titleName">?</h1>
+  <div id="description">Something</div>
   <canvas width="800" height="400"></canvas>
   <div id="controls">
     <section>
-      <button id="playButton" data-playing="no"></button>
-      <button id="fsButton">Full Screen</button>
+      <button id="btn-play" data-playing="no"></button>
+      <button id="btn-fs">Full Screen</button>
 		
       <label>Track: 
-        <select id="trackSelect">
-          <option value="media/New Adventure Theme.mp3" selected>New Adventure Theme</option>
-          <option value="media/Peanuts Theme.mp3">Peanuts Theme</option>
-          <option value="media/The Picard Song.mp3">The Picard Song</option>
+        <select id="select-track">
+          <option value="?" selected>?</option>
+          <option value="?">?</option>
+          <option value="?">?</option>
         </select>
       </label>
     </section>
 		
     <section>
-      Volume: <input type="range" id="volumeSlider" min="0" max="2" value="1" step="0.01">
-      <span id="volumeLabel">???</span>
+      Volume: <input type="range" id="slider-volume" min="0" max="2" value="1" step="0.01">
+      <span id="label-volume">???</span>
     </section>
     <section>
       <span><input type="checkbox" id="gradient-cb"><label for="gradient-cb">Show Gradient</label></span>
       <span><input type="checkbox" id="bars-cb"><label for="bars-cb">Show Bars</label></span>
       <span><input type="checkbox" id="circles-cb"><label for="circles-cb">Show Circles</label></span>
-      <!-- we'll use this 4th checkbox soon! -->
       <span><input type="checkbox" id="noise-cb"><label for="noise-cb">Show Noise</label></span>
       <span><input type="checkbox" id="invert-colors-cb"><label for="invert-colors-cb">Invert Colors</label></span>
       <span><input type="checkbox" id="emboss-cb"><label for="emboss-cb">Show Emboss</label></span>

@@ -1,0 +1,11 @@
+Tell us about the 2 Audio Effect nodes you added to the audio routing graph.
+    I did not add 2 audio effect nodes
+III. Tell us your Sprite's class name, what it looks like/what it does in the visualization
+    My sprite's class name is PhylloFlower, it should look like a spiralling flower with it spiralling changing due to audio, I could not get it to work
+IV. Tell us what app data you put in your av-data.json file
+    I put the title of the app, audioFile, audioFileName, direction, and features of the app
+V. Tell us how you improved the aesthetics of the app over the AV HW:
+    I made the gradient less vivid(popping out at your face)
+    I added a white ring to the circle
+    There was suppose to be a spiralling flower to the right and left of the circle
+    I would give myself a 10% grade, I couldve definitely made more improvement and made it look more advance according to my skill level

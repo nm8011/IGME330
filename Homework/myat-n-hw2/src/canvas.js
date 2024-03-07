@@ -10,9 +10,10 @@
 import * as utils from './utils.js';
 
 let ctx,canvasWidth,canvasHeight,gradient,analyserNode,audioData;
+let flower, flower2;
+let n = 0;
 
-
-function setupCanvas(canvasElement,analyserNodeRef){
+const setupCanvas = (canvasElement,analyserNodeRef) =>{
 	// create drawing context
 	ctx = canvasElement.getContext("2d");
 	canvasWidth = canvasElement.width;
@@ -23,9 +24,13 @@ function setupCanvas(canvasElement,analyserNodeRef){
 	analyserNode = analyserNodeRef;
 	// this is the array where the analyser data will be stored
 	audioData = new Uint8Array(analyserNode.fftSize/2);
+
+    flower = new PhylloFlower(0, canvasWidth * (1/4), canvasHeight/2, 137.5, 4, 60);
+    flower2 = new PhylloFlower(0, canvasWidth * (3/4), canvasHeight/2, 137.5, 4, 60);
+
 }
 
-function draw(params={}){
+const draw = (params={}) =>{
   // 1 - populate the audioData array with the frequency data from the analyserNode
 	// notice these arrays are passed "by reference" 
     analyserNode.getByteFrequencyData(audioData);
@@ -45,6 +50,9 @@ function draw(params={}){
         ctx.fillStyle = gradient;
         ctx.globalAlpha = .3;
         ctx.fillRect(0,0,canvasWidth,canvasHeight);
+        ctx.fillStyle = `rgba(184,255,255,.98)`;
+        ctx.fillRect(0,0,canvasWidth,canvasHeight);
+
         ctx.restore();        
     }
 	// 4 - draw bars
@@ -75,28 +83,17 @@ function draw(params={}){
             //red-ish circles
             let percent = audioData[i] / 255;
             
+            //middle circle
             let circleRadius = percent * maxRadius;
-            ctx.beginPath();
-            ctx.fillStyle = utils.makeColor(255, 111, 111, .34 - percent/3.0);
-            ctx.arc(canvasWidth/2, canvasHeight/2, circleRadius, 0, 2 * Math.PI, false);
-            ctx.fill();
-            ctx.closePath();
+            drawCircle(ctx,circleRadius,0,2,utils.makeColor(255, 111, 111, .34 - percent/3.0));
 
-            //blue-ish circles, bigger, more transparent
-            ctx.beginPath();
-            ctx.fillStyle = utils.makeColor(0, 0, 255, .10 - percent/10.0);
-            ctx.arc(canvasWidth/2, canvasHeight/2, circleRadius * 1.5, 0, 2 * Math.PI, false);
-            ctx.fill();
-            ctx.closePath();
+            //purple outer circle
+            drawCircle(ctx,circleRadius*1.5,0,2,utils.makeColor(184, 0, 255, .10 - percent/10.0));
 
             //yellow-ish circles, smaller
-            ctx.save();
-            ctx.beginPath();
-            ctx.fillStyle = utils.makeColor(200, 200, 0, .5 - percent/5.0);
-            ctx.arc(canvasWidth/2, canvasHeight/2, circleRadius * .50, 0, 2 * Math.PI, false);
-            ctx.fill();
-            ctx.closePath();
-            ctx.restore();
+            drawCircle(ctx,circleRadius*0.5,0,2,utils.makeColor(200, 200, 255, .50 - percent/5.0));
+
+            drawCircle(ctx,circleRadius*2,0,2,utils.makeColor(0,0,0,0),"rgba(255,255,255,1)",10);
         }
         ctx.restore();
     }
@@ -144,8 +141,62 @@ function draw(params={}){
         }
     }
 
+    flower.draw();
+    flower2.draw();
+
 	// D) copy image data back to canvas
     ctx.putImageData(imageData, 0, 0);
 }//end draw()
 
-export {setupCanvas,draw};
+class PhylloFlower{
+    constructor(n=0, centerX=0, centerY=0, divergence=137.5, c=4, fps=60){
+        this.n = 0; //n should be initialized to 0 in your constructor
+        //The values of the other 4 properties must be passed into the constructor as parameters
+        this.centerX = centerX;
+        this.centerY = centerY;
+        this.divergence = divergence;
+        this.c = c;
+        this.fps = fps;
+    }
+
+    draw(){	//a draw() method that takes a ctx argument
+        let percent = audioData[this.n] / 255;
+        let angle = this.n * this.dtr(this.divergence) * percent;
+        let radius = this.c * Math.sqrt(this.n) * percent;
+        let x = radius * Math.cos(angle) + this.centerX;
+        let y = radius * Math.sin(angle) + this.centerY;
+        let color = `hsl(${this.n/5 % 361},100%,50%)`;
+        this.drawCircle(ctx,x,y,2,color);
+        this.n++;
+    }
+
+    drawCircle(ctx,x,y,radius,color){
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x,y,radius,0,Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    }
+
+    dtr(degrees){ return degrees * (Math.PI/180);}
+    update(){
+        setTimeout(() => this.update,1000/this.fps);
+        draw(ctx);
+    }
+}
+const drawCircle = (ctx,radius,startAngle, endAngle, fillStyle, strokeStyle="red", linewidth=0) =>{
+    ctx.save();
+    ctx.fillStyle = fillStyle;
+    ctx.strokeStyle = strokeStyle;
+    ctx.beginPath();
+    ctx.arc(canvasWidth/2, canvasHeight/2, radius, startAngle, endAngle * Math.PI, false);
+    ctx.linewidth = linewidth;
+    ctx.fill();
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore();
+}
+
+export {setupCanvas,draw,PhylloFlower};

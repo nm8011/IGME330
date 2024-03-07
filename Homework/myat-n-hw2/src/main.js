@@ -34,7 +34,7 @@ const DEFAULTS = Object.freeze({
 });
 
 
-function init(){
+const init = () =>{
   audio.setupWebaudio(DEFAULTS.sound1);
 	console.log("init called");
 	console.log(`Testing utils.getRandomColor() import: ${utils.getRandomColor()}`);
@@ -50,10 +50,10 @@ function init(){
   loop();
 }
 
-function setupUI(canvasElement){
+const setupUI = (canvasElement) =>{
   // A - hookup fullscreen button
-  const fsButton = document.querySelector("#fsButton");
-	
+  const fsButton = document.querySelector("#btn-fs");
+	const playButton = document.querySelector("#btn-play");
   // add .onclick event to button
   fsButton.onclick = e => {
     console.log("goFullscreen() called");
@@ -81,8 +81,8 @@ function setupUI(canvasElement){
   };
 
   // C - hookup volume slider & label
-  let volumeSlider = document.querySelector("#volumeSlider");
-  let volumeLabel = document.querySelector("#volumeLabel");
+  let volumeSlider = document.querySelector("#slider-volume");
+  let volumeLabel = document.querySelector("#label-volume");
 
   //add .oninput event to slider
   volumeSlider.oninput = e =>{
@@ -96,7 +96,7 @@ function setupUI(canvasElement){
   volumeSlider.dispatchEvent(new Event("input"));
 
   //D - hookup track <select>
-  let trackSelect = document.querySelector("#trackSelect");
+  let trackSelect = document.querySelector("#select-track");
   //add .onchange event to <select>
   trackSelect.onchange = e =>{
     audio.loadSoundFile(e.target.value);
@@ -152,10 +152,10 @@ function setupUI(canvasElement){
 
 } // end setupUI
 
-function loop(){
+const loop = () =>{
     /* NOTE: This is temporary testing code that we will delete in Part II */
-        requestAnimationFrame(loop);
+        setTimeout(loop, 1000/60);
         canvas.draw(drawParams);
-    }
+}
 
 export {init};
