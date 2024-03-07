@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        const createCounter = function () {
+            // 'count' is a private variable
+            let count = 0;
+
+            return {
+                increase: function () {
+                    count += 1;
+                },
+                decrease: function () {
+                    if (count > 0) {
+                        count -= 1;
+                    }
+                },
+                getCount: function () {
+                    return count;
+                }
+            };
+        };
+
+        // Usage
+        const myCounter = createCounter();
+
+        console.log(myCounter.getCount()); // 0
+        myCounter.increase();
+        console.log(myCounter.getCount()); // 1
+        myCounter.decrease();
+        console.log(myCounter.getCount()); // 0
+
+        // 'count' is not accessible from outside
+        console.log(myCounter.count); // undefined
+
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
