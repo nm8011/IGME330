@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Simple Animation #3</title>
+	<style>
+	canvas{
+		border: 1px solid gray;
+	}
+	*{
+		font-family: sans-serif;
+	}
+	code{
+		font-family: monospace;
+	}
+	</style>
+	<script>
+		"use strict";
+		// https://www.webtips.dev/webtips/javascript/how-to-clamp-numbers-in-javascript
+		const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+		
+		let ctx; 
+		// dx & dy are now "per second"
+		const sprite = {x:400, y:400 ,r:20, dx:Math.random() * 200 + 100, dy:Math.random() * 200 + 100}; 
+		let lastTime = 0;
+		let dt = 0;
+		let paused = false;
+		
+		const loop = (time=0) => {
+			if(paused){
+				ctx.save();
+				ctx.fillStyle = "yellow"; 
+				ctx.font = "64px monospace";
+				ctx.textBaseline = "alphabetic";
+				ctx.textAlign = "center";
+				ctx.fillText("PAUSED",320,240);
+				ctx.restore();
+				return;
+			}
+			
+			// schedule call to loop
+			requestAnimationFrame(loop);
+			dt = (time - lastTime)/1000;
+			dt = clamp(dt,1/144,1/12);
+			lastTime = time;
+			
+			if(dt>1) console.log("Oops, dt=",dt);
+						
+			// move sprite
+			sprite.x += (sprite.dx * dt);
+			sprite.y += (sprite.dy * dt);
+			
+			// draw background
+			ctx.fillStyle = "green"; 
+			ctx.fillRect(0,0,640,480);
+			ctx.fillStyle = "yellow"; 
+			ctx.font = "15px monospace";
+			ctx.textBaseline = "top";
+			ctx.fillText(`fps: ${(1/dt).toFixed(2)}`,3,3);
+			ctx.fillText(`dt: ${dt.toFixed(4)}`,3,23);
+			ctx.fillText(`elapsed time: ${(time/1000).toFixed(2)}`,3,43);
+			
+			
+			// draw sprite
+			ctx.fillStyle = "red"; 
+			ctx.beginPath();
+			ctx.arc(sprite.x,sprite.y,sprite.r,0,Math.PI * 2,false);
+			ctx.closePath();
+			ctx.fill();
+			
+			// check bounce
+			if(sprite.x <= sprite.r || sprite.x >= 640 - sprite.r){
+				sprite.dx *= -1;
+				// extra move needed because of pausing
+				sprite.x += (sprite.dx * dt);
+				sprite.y += (sprite.dy * dt);
+			} 
+			if(sprite.y <= sprite.r || sprite.y >= 480 - sprite.r){
+				sprite.dy *= -1;
+				// extra move needed because of pausing
+				sprite.x += (sprite.dx * dt);
+				sprite.y += (sprite.dy * dt);
+			}
+			
+		};
+		
+		const init = () => {
+			console.log("page loaded!");
+			let canvas = document.querySelector('canvas');
+			ctx = canvas.getContext('2d');
+			window.onblur = () => {
+				paused = true;
+			};
+			window.onfocus = () => {
+				paused = false;
+				loop();
+			};
+			loop();
+		};
+		
+		window.onload = init;
+		
+		
+	</script>
+</head>
+<body>
+	<canvas width="640" height="480">
+		Get a real browser!
+	</canvas>
+	<p>Below we have implementing "pausing/unpausing" with <code>window.onblur</code> and <code>window.onfocus</code></p>
+	<p>Test this by creating a new browser <i>window</i> and switching between this window and the new window. You should see the "PAUSED" message in this window when it loses focus.</p>
+	<p>Also check out the <code>clamp()</code> function, which is constraining <code>dt</code> to reasonable values (regardless of how large the <code>time</code> value gets) whenever this window comes back into focus. You can test the <code>clamp()</code> by creating a new browser tab and switching to it for a few seconds.</p>
+</body>
+</html>

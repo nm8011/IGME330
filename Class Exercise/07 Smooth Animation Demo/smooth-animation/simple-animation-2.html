@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Simple Animation #2</title>
+	<style>
+	canvas{
+		border: 1px solid gray;
+	}
+	*{
+		font-family: sans-serif;
+	}
+	code{
+		font-family: monospace;
+	}
+	</style>
+	<script>
+		"use strict";
+		
+		let ctx; 
+		// dx & dy are now "per second"
+		const sprite = {x:400, y:400 ,r:20, dx:Math.random() * 200 + 100, dy:Math.random() * 200 + 100}; 
+		let lastTime = 0;
+		let dt = 0;
+		
+		const loop = (time=0) => {
+			// schedule call to loop
+			requestAnimationFrame(loop);
+			dt = (time - lastTime)/1000;
+			lastTime = time;
+			
+			if(dt>1) console.log("Oops, dt=",dt);
+						
+			// move sprite
+			sprite.x += (sprite.dx * dt);
+			sprite.y += (sprite.dy * dt);
+			
+			// draw background
+			ctx.fillStyle = "green"; 
+			ctx.fillRect(0,0,640,480);
+			ctx.fillStyle = "yellow"; 
+			ctx.font = "15px monospace";
+			ctx.textBaseline = "top";
+			ctx.fillText(`fps: ${(1/dt).toFixed(2)}`,3,3);
+			ctx.fillText(`dt: ${dt.toFixed(4)}`,3,23);
+			ctx.fillText(`elapsed time: ${(time/1000).toFixed(2)}`,3,43);
+			
+			// draw sprite
+			ctx.fillStyle = "red"; 
+			ctx.beginPath();
+			ctx.arc(sprite.x,sprite.y,sprite.r,0,Math.PI * 2,false);
+			ctx.closePath();
+			ctx.fill();
+			
+			// check bounce
+			if(sprite.x <= sprite.r || sprite.x >= 640 - sprite.r) sprite.dx *= -1;
+			if(sprite.y <= sprite.r || sprite.y >= 480 - sprite.r) sprite.dy *= -1;
+			
+		};
+		
+		const init = () => {
+			console.log("page loaded!");
+			let canvas = document.querySelector('canvas');
+			ctx = canvas.getContext('2d');
+			loop();
+		};
+		
+		window.onload = init;
+		
+		
+	</script>
+</head>
+<body>
+	<canvas width="640" height="480">
+		Get a real browser!
+	</canvas>
+	<p>This version also uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a> for animation and also utilizes the timestamp that is passed to the <code>loop()</code> function to calculate the "delta time" (<code>dt</code>) - which is how many milliseconds have gone by since the most recent call to  <code>window.requestAnimationFrame()</code></p>
+	<p>By multiplying <code>dt</code> times the desired sprite speed per second, we will get consistent sprite motion despite the actual frame rate of the page at that moment.</p>
+	<p>ISSUE: Make a new browser tab and switch over to it for a few seconds, then come back to this page - where did the sprite go?</p>
+	<p>What has happened is that while our <code>window.requestAnimationFrame()</code> has been paused by the browser, the <code>time</code> variable (which represents how long the app has been running since page load) is still getting larger. This means that when we return to this tab, <code>dt</code> will be a very large number (equal to the number of seconds we were on the other tab), which will end up placing our sprite off of the screen.</p>
+	<p>There are a few ways to tackle this problem - one quick solution is to write code to "clamp" <code>dt</code> to a range of reasonable values - perhaps between 1/12 (the <code>dt</code> for 12fps) and 1/144 (the <code>dt</code> for a 144fps "Gaming Monitor")</p>
+</body>
+</html>

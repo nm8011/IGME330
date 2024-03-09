@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Simple Animation #4</title>
+	<style>
+	canvas{
+		border: 1px solid gray;
+	}
+	*{
+		font-family: sans-serif;
+	}
+	code{
+		font-family: monospace;
+	}
+	</style>
+	<script>
+		"use strict";
+		// https://www.webtips.dev/webtips/javascript/how-to-clamp-numbers-in-javascript
+		const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+		
+		
+		// // NEW - Class Sprite
+		// fwd.x & fwd.y replace dx & dy
+		// TODO: make fwd an instance of a `Vec2` class, give it add, subtract methods, make it a normalized vector etc
+		class Sprite{
+			constructor(x,y,r,fwd,speed=200,color="red"){
+				Object.assign(this,{x,y,r,fwd,speed,color});
+			}
+		
+			move(dt){
+				this.x += this.fwd.x * this.speed * dt;
+				this.y += this.fwd.y * this.speed * dt;
+			}
+			
+			bounceX(){
+				this.fwd.x *= -1;
+			}
+			
+			bounceY(){
+				this.fwd.y *= -1;
+			}
+			
+			draw(ctx){
+				ctx.save();
+				ctx.fillStyle = this.color;
+				ctx.beginPath();
+				ctx.arc(this.x,this.y,this.r,0,Math.PI * 2);
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+			}
+			
+		}
+		
+		let ctx; 
+
+		const sprites = [];
+		let lastTime = 0;
+		let dt = 0;
+		let paused = false;
+		
+		const loop = (time=0) => {
+			if(paused){
+				ctx.save();
+				ctx.fillStyle = "yellow"; 
+				ctx.font = "64px monospace";
+				ctx.textBaseline = "alphabetic";
+				ctx.textAlign = "center";
+				ctx.fillText("PAUSED",320,240);
+				ctx.restore();
+				return;
+			}
+			
+			// schedule call to loop
+			requestAnimationFrame(loop);
+			dt = (time - lastTime)/1000;
+			dt = clamp(dt,1/144,1/12);
+			lastTime = time;
+			
+			if(dt>1) console.log("Oops, dt=",dt);
+						
+			
+			// draw background
+			ctx.fillStyle = "green"; 
+			ctx.fillRect(0,0,640,480);
+			ctx.fillStyle = "yellow"; 
+			ctx.font = "15px monospace";
+			ctx.textBaseline = "top";
+			ctx.fillText(`fps: ${(1/dt).toFixed(2)}`,3,3);
+			ctx.fillText(`dt: ${dt.toFixed(4)}`,3,23);
+			ctx.fillText(`elapsed time: ${(time/1000).toFixed(2)}`,3,43);
+			
+			
+			// move & draw sprites
+			for (let s of sprites){
+				s.move(dt);
+					//	check bounce
+				if(s.x <= s.r || s.x >= 640 - s.r){
+					s.bounceX()
+					// extra move needed because of pausing
+					s.move(dt);
+				} 
+				if(s.y <= s.r || s.y >= 480 - s.r){
+					s.bounceY()
+					// extra move needed because of pausing
+					s.move(dt);
+				}
+				s.draw(ctx);
+			}
+		};
+		
+		const init = () => {
+			console.log("page loaded!");
+			let canvas = document.querySelector('canvas');
+			ctx = canvas.getContext('2d');
+			window.onblur = () => {
+				paused = true;
+			};
+			window.onfocus = () => {
+				paused = false;
+				loop();
+			};
+			sprites.push(new Sprite(50,50,20,{x:Math.random(),y:Math.random()}));
+			sprites.push(new Sprite(200,200,20,{x:Math.random(),y:Math.random()},400,"purple"));
+			sprites.push(new Sprite(Math.random()*500 + 50,Math.random()*400 + 50,Math.random() * 20 + 20,{x:Math.random(),y:Math.random()},Math.random() * 300 + 200,"yellow"));
+			loop();
+		};
+		
+		window.onload = init;
+		
+		
+	</script>
+</head>
+<body>
+	<canvas width="640" height="480">
+		Get a real browser!
+	</canvas>
+	<p>This version adds a <code>Sprite</code> class and a few other enhancements</p>
+	</body>
+</html>

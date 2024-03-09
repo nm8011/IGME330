@@ -1,0 +1,211 @@
+<html>
+<head>
+<style>
+/* https://codepen.io/MattWindle/pen/perZRG */
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	html {
+		background-color: #eee;
+	}
+
+	.container {
+		margin: 20px auto;
+		width: 800px;
+		height: 800px;
+		background-color: #fff;
+		display: grid;
+		grid-template-columns: 400px 400px;
+		grid-row: auto auto;
+		grid-column-gap: 10px;
+		grid-row-gap: 10px;
+	}
+	.container .box {
+		background-color: #333;
+		padding: 10px;
+		border-radius: 10px;
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 40px;
+		font-family: sans-serif;
+	}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.js" integrity="sha256-u8njNpzE/7fzKRST7Eu38nECKwFREeLMkipUauqgPpY=" crossorigin="anonymous"></script></head>
+<body>
+	<div class="container">
+		<div class="box"><canvas id="canvas1"></canvas></div>
+		<div class="box"><canvas id="canvas2"></canvas></div>
+		<div class="box"><canvas id="canvas3"></canvas></div>
+		<div class="box"><canvas id="canvas4"></canvas></div>
+	</div>
+<script>
+"use strict";
+
+  const canvasWidth=300,canvasHeight=300;
+  const fps = 30;
+
+  const ctx1 = canvas1.getContext("2d");
+  ctx1.canvas.width = canvasWidth;
+  ctx1.canvas.height = canvasHeight;
+  drawRect(ctx1,0,0,canvasWidth,canvasHeight,getCSSColor(200,200,200));
+  const imageData1 = ctx1.getImageData(0, 0, canvasWidth, canvasHeight);
+	
+  const ctx2 = canvas2.getContext("2d");
+  ctx2.canvas.width = canvasWidth;
+  ctx2.canvas.height = canvasHeight;
+  const imageData2 = ctx2.getImageData(0, 0, canvasWidth, canvasHeight);
+  
+  const ctx3 = canvas3.getContext("2d");
+  ctx3.canvas.width = canvasWidth;
+  ctx3.canvas.height = canvasHeight;
+  drawRect(ctx3,0,0,canvasWidth,canvasHeight,getCSSColor(200,200,200));
+  const imageData3 = ctx3.getImageData(0, 0, canvasWidth, canvasHeight);
+  
+  const ctx4 = canvas4.getContext("2d");
+  ctx4.canvas.width = canvasWidth;
+  ctx4.canvas.height = canvasHeight;
+  const imageData4 = ctx4.getImageData(0, 0, canvasWidth, canvasHeight);
+ // drawRect(ctx4,0,0,canvasWidth,canvasHeight,getCSSColor(200,200,200));
+  
+  const simplex = new SimplexNoise();
+  let t = 0;
+  let mousePercent = {x:.5,y:.5};
+  let increase = 1;
+  
+  ctx4.canvas.onmousemove = doMousemove;
+  ctx4.canvas.onmouseout = e => {mousePercent = {x:.5,y:.5}; increase = 1};
+  loop();
+  
+
+  function loop(){
+  	//requestAnimationFrame(loop);
+  	setTimeout(loop,1000/fps);
+  	drawNoise(ctx1,imageData1);
+  	drawSimplexA(ctx2,imageData2);
+  	drawSimplexB(ctx3,imageData3);
+  	drawSimplexC(ctx4,imageData4);
+  	t += increase;
+  }
+  
+   function drawNoise(ctx,imageData){
+  	const data = imageData.data;
+  	for (let y = 0; y < canvasHeight; y++) {
+			for (let x = 0; x < canvasWidth; x++) {
+				const index = (x + y * canvasWidth) * 4;
+				const val = Math.floor(Math.random() * 256);
+				data[index + 0] = val;
+				data[index + 1] = val;
+				data[index + 2] = val;
+				data[index + 3] = 255;
+			}
+		}
+		ctx.putImageData(imageData, 0, 0);
+  }
+  
+  function drawSimplexA(ctx,imageData){
+  	//https://codepen.io/jwagner/pen/BNmpdm/?editors=001
+  	const data = imageData.data;
+  	for (let y = 0; y < canvasHeight; y++) {
+			for (let x = 0; x < canvasWidth; x++) {
+				const val = simplex.noise3D(x / 16, y / 16, t/16) * 0.5 + 0.5;
+				const index = (x + y * canvasWidth) * 4;
+				data[index + 0] = val * 255;
+				data[index + 1] = val * 255;
+				data[index + 2] = val * 255;
+				data[index + 3] = 255;
+			}
+		}
+		ctx.putImageData(imageData, 0, 0);
+  }
+  
+  function drawSimplexB(ctx,imageData){
+  	//https://codepen.io/jwagner/pen/BNmpdm/?editors=001
+  	const data = imageData.data;
+  	for (let y = 0; y < canvasHeight; y++) {
+			for (let x = 0; x < canvasWidth; x++) {
+				const r = simplex.noise3D((x / 32), (y / 32), (t/32)) * 0.5 + 0.5;
+				const g = simplex.noise3D((x / 16), (y / 16), t/16) * 0.5 + 0.5;
+				const b = simplex.noise3D((x / 2), y / 2, t/8) * 0.5 + 0.5;
+				const index = (x + y * canvasWidth) * 4;
+				data[index + 0] = r * 255;
+				data[index + 1] = g * 255;
+				data[index + 2] = b * 255;
+				data[index + 3] = 255;
+			}
+		}
+		ctx.putImageData(imageData, 0, 0);
+  }
+  
+  function drawSimplexC(ctx,imageData){
+  	//https://codepen.io/jwagner/pen/BNmpdm/?editors=001
+  	const data = imageData.data;
+  	for (let y = 0; y < canvasHeight; y++) {
+			for (let x = 0; x < canvasWidth; x++) {
+				const r = simplex.noise3D((x / 16) * mousePercent.x, (y / 16) * mousePercent.y, (t/16) * ((mousePercent.x + mousePercent.y)/2)) * 0.5 + 0.5;
+				const g = simplex.noise3D((x / 8) * mousePercent.x, (y / 8) * mousePercent.y, (t/16) * ((mousePercent.x + mousePercent.y)/2)) * 0.5 + 0.5;
+				const b = simplex.noise3D((x / 4) * mousePercent.x, (y / 4) * mousePercent.y, t/16) * 0.5 + 0.5;
+				const index = (x + y * canvasWidth) * 4;
+				data[index + 0] = r * 255;
+				data[index + 1] = g * 255;
+				data[index + 2] = b * 255;
+				data[index + 3] = 255;
+			}
+		}
+		ctx.putImageData(imageData, 0, 0);
+  }
+  
+  
+  
+  function doMousemove(e) {
+		const mouse = getMouse(e);
+		const percentX = (mouse.x/e.target.width);
+		const percentY = (mouse.y/e.target.height);
+		
+		mousePercent.x = 1 - percentX;
+		mousePercent.y = 1 - percentY;
+		
+		increase = (percentX + percentY + .25) * 2; // .25x to 2.25x
+	}
+		
+		
+// UTILS
+    
+  function drawRect(ctx,x,y,width,height,fillStyle){
+  	ctx.save()
+  	ctx.fillStyle = fillStyle;
+  	ctx.fillRect(x,y,width,height);
+  	ctx.restore();
+  }
+  
+   function drawCircle(ctx,x,y,radius,fillStyle){
+  	ctx.save()
+  	ctx.fillStyle = fillStyle;
+  	ctx.beginPath()
+  	ctx.arc(x,y,radius,0,Math.PI*2);
+  	ctx.closePath();
+  	ctx.fill();
+  	ctx.restore();
+  }
+  
+  function getCSSColor(r,g,b){
+  	return `rgb(${r},${g},${b})`;
+  }
+  
+  function getMouse(e){
+		const mouse = {}
+		mouse.x = e.pageX - e.target.offsetLeft;
+		mouse.y = e.pageY - e.target.offsetTop;
+		return mouse;
+	}
+  
+  
+    
+</script>
+</body>
+</html>

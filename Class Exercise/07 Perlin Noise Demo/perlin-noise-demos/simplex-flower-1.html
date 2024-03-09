@@ -1,0 +1,338 @@
+<html>
+<head>
+<style>
+/* https://codepen.io/MattWindle/pen/perZRG */
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	html {
+		background-color: #eee;
+	}
+
+	.container {
+		margin: 20px 20px;
+		width: 700px;
+		height: 700px;
+		background-color: #fff;
+		display: grid;
+		grid-template-columns: 400px 400px;
+		grid-row: auto auto;
+		grid-column-gap: 10px;
+		grid-row-gap: 10px;
+	}
+	.container .box {
+		background-color: #333;
+		padding: 10px;
+		border-radius: 10px;
+		color: #fff;
+		display: flex;
+		flex-direction:column;
+		align-items: center;
+		/* justify-content: center; */
+		font-size: 14px;
+		font-family: sans-serif;
+	}
+	
+	.container .box canvas{
+		margin-bottom:1em;
+	}
+	
+	.container .box p{
+		margin-bottom:1em;
+	}
+	
+	
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.js" integrity="sha256-u8njNpzE/7fzKRST7Eu38nECKwFREeLMkipUauqgPpY=" crossorigin="anonymous"></script></head>
+
+</head>
+<body>
+	<div class="container">
+		<div class="box">
+			<canvas id="canvas1"></canvas>
+			<div>
+				<p>Circle Radius: <input id=sliderRadius type="range" min=20 max=180 value=50 step=5></p>
+				<p>Point Size: <input id=sliderPointSize type="range" min=1 max=10 value=2 step=1></p>
+				<p>Num Points: <input id=sliderNumPoints type="range" min=10 max=100 value=20 step=5></p>
+			</div>
+		</div>
+		<div class="box">
+		  <canvas id="canvas2"></canvas>
+		  <div>
+		  	<p>Random Magnitude: <input id=sliderRandomMagnitude type="range" min=1 max=20 value=4 step=1></p>
+		  	<p>FPS: <input id=sliderFPS type="range" min=1 max=60 value=30 step=1></p>
+		  	<p>Show shape: <input id=cbShowShape type="checkbox" checked></p>
+		  </div>
+		</div>
+		<div class="box">
+			<canvas id="canvas3"></canvas>
+			<div>
+				<p>Frequency: <input id=sliderFrequency type="range" min=0 max=10 value=2 step=.1></p>
+				<p>Magnitude: <input id=sliderMagnitude type="range" min=0 max=1 value=.5 step=.05></p>
+				<p>Speed: <input id=sliderSpeed type="range" min=.001 max=.2 value=.1 step=.001></p>
+			</div>
+		</div>
+		<div class="box"><canvas id="canvas4"></canvas></div>
+	</div>
+
+<script>
+	const canvasWidth=300,canvasHeight=300;
+  let fps = 30;
+
+  let ctx1,ctx2,ctx3,ctx4;
+  
+  const simplex = new SimplexNoise();
+  let radius = 50, pointSize = 2, numPoints = 20;
+  let frequency = 2, magnitude = .5;
+  let t = 0, tIncrease = .1;
+  let randomMagnitude = 4;
+  let showShape = true;
+  
+  setupContexts();
+  setupUI();
+  
+  updateCtx1();
+  updateCtx2();
+  updateCtx3();
+  
+  loop();
+  
+  function loop(){
+  	setTimeout(loop,1000/fps);
+  	updateCtx2();
+  	updateCtx3();
+  	updateCtx4();
+  	t+=tIncrease;
+  }
+  
+  function setupContexts(){
+  	ctx1 = canvas1.getContext("2d");
+  	ctx1.canvas.width = canvasWidth;
+  	ctx1.canvas.height = canvasHeight;
+  	
+  	ctx2 = canvas2.getContext("2d");
+  	ctx2.canvas.width = canvasWidth;
+  	ctx2.canvas.height = canvasHeight;
+  	
+  	ctx3 = canvas3.getContext("2d");
+  	ctx3.canvas.width = canvasWidth;
+  	ctx3.canvas.height = canvasHeight;
+  	
+  	ctx4 = canvas4.getContext("2d");
+  	ctx4.canvas.width = canvasWidth;
+  	ctx4.canvas.height = canvasHeight;
+  }
+  
+  function setupUI(){
+  	sliderRadius.oninput = e => {
+			radius = +e.target.value;
+			updateCtx1();
+		};
+		
+		sliderPointSize.oninput = e => {
+			pointSize = +e.target.value;
+			updateCtx1();
+		};
+		
+		sliderNumPoints.oninput = e => {
+			numPoints = +e.target.value;
+			updateCtx1();
+		};
+		
+		sliderRandomMagnitude.oninput = e => {
+			randomMagnitude = +e.target.value;
+		//	updateCtx2();
+		};
+		
+		sliderFPS.oninput = e => {
+			fps = +e.target.value;
+		};
+		
+		cbShowShape.onchange = e => {
+			showShape = e.target.checked;
+		};
+		
+  	sliderFrequency.oninput = e => {
+			frequency = +e.target.value;
+			updateCtx3();
+		};
+  
+		sliderMagnitude.oninput = e => {
+			magnitude = +e.target.value;
+			updateCtx3();
+		};
+		
+		sliderSpeed.oninput = e => {
+			tIncrease = +e.target.value;
+			updateCtx3();
+		};
+		
+	
+  }
+  
+  function updateCtx1(){
+  	drawRect(ctx1,0,0,canvasWidth,canvasHeight,getRgbaColor(200,200,200));
+  	drawPointCircle(ctx1,150,150,radius,pointSize,numPoints);
+  }
+  
+  function updateCtx2(){
+  	drawRect(ctx2,0,0,canvasWidth,canvasHeight,getRgbaColor(200,200,200));
+  	drawPointCircleRandom(ctx2,150,150,radius,pointSize,numPoints,randomMagnitude);
+  }
+  
+  function updateCtx3(){
+  	drawRect(ctx3,0,0,canvasWidth,canvasHeight,getRgbaColor(200,200,200));
+  	drawDeformedCircle(ctx3, {x:150,y:150,radius:50},frequency,magnitude,t);
+  }
+  
+  function updateCtx4(){
+  	drawRect(ctx4,0,0,canvasWidth,canvasHeight,getRgbaColor(200,200,200));
+  	drawDeformedCircle(ctx4, {x:150,y:150,radius:50},frequency,magnitude,t/2);
+  }
+  
+  function drawPointCircle(ctx,xPos,yPos,radius,pointSize=2,numPoints=20){
+  	ctx.save()
+  	ctx.fillStyle = getRgbaColor(255,0,0);
+		for (let i = 0; i <= numPoints; i++) {
+				const angle = (2 * Math.PI * i) / numPoints;
+				const x = Math.cos(angle);
+				const y = Math.sin(angle);
+			//	drawCircle(ctx,xPos + radius*x,yPos + radius*y,pointSize,getRgbaColor(255,0,0));
+			let newX = xPos + radius*x;
+			let newY = yPos + radius*y;
+			let w2 = pointSize/2;
+			ctx.fillRect(newX-w2,newY-w2,pointSize,pointSize);
+		}
+		ctx.restore();
+	}
+	
+	function drawPointCircleRandom(ctx,xPos,yPos,radius,pointSize=2,numPoints=20,magnitude=2){
+		ctx.save()
+  	ctx.fillStyle = getRgbaColor(255,0,0);
+		ctx.beginPath();
+		for (let i = 0; i <= numPoints; i++) {
+				const angle = (2 * Math.PI * i) / numPoints;
+				const x = Math.cos(angle);
+				const y = Math.sin(angle);
+				const deformationX = (Math.random() * 2 - 1) * magnitude;
+				const deformationY = (Math.random() * 2 - 1) * magnitude;
+				let newX = xPos + deformationX + radius*x;
+				let newY = yPos + deformationY+ radius*y;
+				let w2 = pointSize/2;
+				ctx.fillRect(newX-w2,newY-w2,pointSize,pointSize);
+			//	drawCircle(ctx,xPos + deformationX + (radius*x),yPos + deformationY + (radius*y),pointSize,getRgbaColor(255,0,0));
+			ctx.lineTo(newX, newY);
+		}
+		ctx.closePath();
+		if(showShape){
+			ctx.fillStyle = "yellow";
+			ctx.strokeStyle= "gray";
+			ctx.lineWidth = 4;
+			ctx.fill();
+			ctx.stroke();
+		}
+		ctx.restore();
+	}
+	
+  // frequency 0-10, magnitude 0-1
+  function drawDeformedCircle(ctx,circle,frequency,magnitude,t=0) {
+		ctx.save();
+		ctx.fillStyle = "yellow";
+		ctx.strokeStyle= "gray";
+		ctx.lineWidth = 4;
+		ctx.beginPath();
+
+		// Sample points evenly around the circle
+		const numPoints = Math.floor(4 * circle.radius + 20);
+		for (let i = 0; i <= numPoints; i++) {
+				const angle = (2 * Math.PI * i) / numPoints;
+
+				// Figure out the x/y coordinates for the given angle
+				const x = Math.cos(angle);
+				const y = Math.sin(angle);
+
+				// Randomly deform the radius of the circle at this point
+				const deformation = simplex.noise3D(x * frequency,
+																					y * frequency,
+																					t) + 1;
+				const radius = circle.radius * (1 + magnitude * deformation);
+
+				// Extend the circle to this deformed radius
+				ctx.lineTo(circle.x + radius * x, circle.y + radius * y);
+		}
+		
+		ctx.closePath()
+		ctx.fill();
+		ctx.stroke();
+		ctx.restore();
+	}
+  
+  function drawRect(ctx,x,y,width,height,fillStyle){
+  	ctx.save()
+  	ctx.fillStyle = fillStyle;
+  	ctx.fillRect(x,y,width,height);
+  	ctx.restore();
+  }
+  
+   function drawCircle(ctx,x,y,radius,fillStyle){
+  	ctx.save()
+  	ctx.fillStyle = fillStyle;
+  	ctx.beginPath()
+  	ctx.arc(x,y,radius,0,Math.PI*2);
+  	ctx.closePath();
+  	ctx.fill();
+  	ctx.restore();
+  }
+  
+	function getRgbaColor(r,g,b,a=1){
+		return `rgb(${r},${g},${b},${a})`;
+	}
+/*
+
+drawDeformedCircle(ctx, current,
+                           frequency, magnitude,
+                           i * independence);
+
+import OpenSimplexNoise from "open-simplex-noise";
+
+const noise = new OpenSimplexNoise(40);
+
+export function drawDeformedCircle(ctx: CanvasRenderingContext2D,
+                                   circle: {x: number, y: number, radius: number},
+                                   frequency: number,
+                                   magnitude: number,
+                                   seed: number = 0): void {
+        ctx.beginPath();
+
+        // Sample points evenly around the circle
+        const samples = Math.floor(4 * circle.radius + 20);
+        for (let j = 0; j < samples + 1; ++j) {
+            const angle = (2 * Math.PI * j) / samples;
+
+            // Figure out the x/y coordinates for the given angle
+            const x = Math.cos(angle);
+            const y = Math.sin(angle);
+
+            // Randomly deform the radius of the circle at this point
+            const deformation = noise.noise3D(x * frequency,
+                                              y * frequency,
+                                              seed) + 1;
+            const radius = circle.radius * (1 + magnitude * deformation);
+
+            // Extend the circle to this deformed radius
+            ctx.lineTo(circle.x + radius * x,
+                       circle.y + radius * y);
+        }
+        ctx.fill();
+        ctx.stroke();
+}
+*/
+</script>
+
+
+</body>
+</html>

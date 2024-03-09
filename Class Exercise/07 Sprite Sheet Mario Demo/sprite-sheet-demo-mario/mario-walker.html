@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Spritesheet Demo</title>
+	<style>
+		canvas{
+			border:1px solid black;
+		}
+	</style>
+</head>
+<body>
+<canvas id="top-canvas" width="600" height="150"></canvas>
+<br>
+<canvas id="canvas" width="600" height="500"></canvas>
+
+<script>
+	"use strict";
+	const ctxTop = document.querySelector("#top-canvas").getContext("2d");
+	const canvas = document.querySelector("#canvas");
+	const ctx = canvas.getContext("2d");
+	const spritesheetURL = "./smb_mario_sheet.png";
+	let marioImage;
+	
+  // define sprite positions from sprite sheet
+	const marioWalkRight = [
+	  {x:300, y:50, w: 24, h: 36},
+	  {x:270, y:50, w: 24, h: 36},
+	  {x:240, y:50, w: 24, h: 36}
+	];
+	const marioWalkLeft = [
+	  {x:90, y:50, w: 24, h: 36},
+	  {x:120, y:50, w: 24, h: 36},
+	  {x:150, y:50, w: 24, h: 36}
+	];
+	
+	let walkFrame = 0;
+	let walkDirection = 1;
+	let walkSpeed = 10;
+	let walkPositionX = 0;
+	let walkPositionY = 250;
+	
+	preloadImage(spritesheetURL,init); 	
+
+	
+	function init(img){
+		marioImage = img;
+		
+		// Draw all 6 frames in the top canvas (so we can see what they look like)
+		ctxTop.fillStyle = "coral";
+		ctxTop.fillRect(0,0,600,150);
+		// ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+		// use sx, sy, sWidth, sHeight to sample just part of the image
+		ctxTop.drawImage(marioImage, 
+			marioWalkRight[0].x, 
+			marioWalkRight[0].y, 
+			marioWalkRight[0].w, 
+			marioWalkRight[0].h, 
+			0, 0, 100, 150);
+		
+		ctxTop.drawImage(marioImage, 
+			marioWalkRight[1].x, 
+			marioWalkRight[1].y, 
+			marioWalkRight[1].w, 
+			marioWalkRight[1].h, 
+			100, 0, 100, 150);
+			
+		ctxTop.drawImage(marioImage, 
+			marioWalkRight[2].x, 
+			marioWalkRight[2].y, 
+			marioWalkRight[2].w, 
+			marioWalkRight[2].h, 
+			200, 0, 100, 150);
+
+		ctxTop.drawImage(marioImage, 
+			marioWalkLeft[0].x, 
+			marioWalkLeft[0].y, 
+			marioWalkLeft[0].w, 
+			marioWalkLeft[0].h, 
+			300, 0, 100, 150);
+			
+		ctxTop.drawImage(marioImage, 
+			marioWalkLeft[1].x, 
+			marioWalkLeft[1].y, 
+			marioWalkLeft[1].w, 
+			marioWalkLeft[1].h, 
+			400, 0, 100, 150);
+			
+		ctxTop.drawImage(marioImage, 
+			marioWalkLeft[2].x, 
+			marioWalkLeft[2].y, 
+			marioWalkLeft[2].w, 
+			marioWalkLeft[2].h, 
+			500, 0, 100, 150);
+			
+		loop(); // kick off animation
+	}
+	
+	function loop(){
+		setTimeout(loop, 100); // 10 FPS
+		ctx.fillStyle = "yellow";
+		ctx.fillRect(0,0,600,600);
+		let marioWalk = marioWalkRight;
+		if (!walkDirection) marioWalk = marioWalkLeft;
+		
+		ctx.drawImage(marioImage, 
+			marioWalk[walkFrame].x, 
+			marioWalk[walkFrame].y, 
+			marioWalk[walkFrame].w, 
+			marioWalk[walkFrame].h, 
+			walkPositionX, walkPositionY, 100, 150);
+
+		walkFrame = (walkFrame+1) % marioWalk.length;
+		
+		walkPositionX += walkSpeed;
+		if (walkPositionX > (canvas.width - marioWalkRight[0].w * 2) || walkPositionX < 0){
+			walkSpeed *= -1;
+			walkDirection = !walkDirection;
+			walkPositionX += walkSpeed;
+		}
+	} // end loop()
+	
+	// HELPERS
+	
+	// preloadImage(url,callback) - simple pre-loader that loads 1 image
+	// Hey - why don't you rewrite this to handle an *array* of images! :-)
+	// preloadImage(imageURL,callbackFunc);
+	function preloadImage(url,callback){
+		let img = new Image();
+		img.src = url;
+		img.onload = () => {
+			callback(img);
+		};
+		img.onerror = () => {
+			console.log(`Image at url "${url}" wouldn't load! Check your URL!`);
+		};
+	}
+</script>
+</body>
+</html>

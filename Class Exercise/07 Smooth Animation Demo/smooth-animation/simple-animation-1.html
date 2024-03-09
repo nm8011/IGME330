@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Simple Animation #1</title>
+	<style>
+	canvas{
+		border: 1px solid gray;
+	}
+	*{
+		font-family: sans-serif;
+	}
+	code{
+		font-family: monospace;
+	}
+	</style>
+	<script>
+		"use strict";
+	
+		let ctx;
+		const sprite = {x:400, y:400 ,r:20, dx: 1 + Math.random() * 4, dy: 1+ Math.random() * 4};
+		let lastTime = 0;
+		
+		const loop = () => {
+			// schedule call to loop
+			requestAnimationFrame(loop);
+			
+			const timestamp = performance.now();
+			const frameDelay = timestamp - lastTime;
+			const fps = 1 / frameDelay * 1000;
+			lastTime = timestamp;
+			
+			// move sprite
+			sprite.x += sprite.dx;
+			sprite.y += sprite.dy;
+			
+			// draw background
+			ctx.fillStyle = "green"; 
+			ctx.fillRect(0,0,640,480);
+			ctx.fillStyle = "yellow"; 
+			ctx.font = "15px monospace";
+			ctx.textBaseline = "top";
+			ctx.fillText(`frame delay: ${frameDelay.toFixed(2)}ms`,3,3);
+			ctx.fillText(`fps: ${fps.toFixed(1)}`,3,23);
+			ctx.fillText(`elapsed time: ${(lastTime/1000).toFixed(1)}`,3,43);
+			
+			// draw sprite
+			ctx.fillStyle = "red"; 
+			ctx.beginPath();
+			ctx.arc(sprite.x,sprite.y,sprite.r,0,Math.PI * 2,false);
+			ctx.closePath();
+			ctx.fill();
+			
+			// check bounce
+			if(sprite.x <= sprite.r || sprite.x >= 640 - sprite.r) sprite.dx *= -1;
+			if(sprite.y <= sprite.r || sprite.y >= 480 - sprite.r) sprite.dy *= -1;
+			
+		};
+		
+		const init = () => {
+			console.log("page loaded!");
+			let canvas = document.querySelector('canvas');
+			ctx = canvas.getContext('2d');
+			loop();
+		};
+		
+		window.onload = init;
+		
+		
+	</script>
+</head>
+<body>
+	<canvas width="640" height="480">
+		Get a real browser!
+	</canvas>
+	<p>This version uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a> for animation and works pretty well, except ...</p>
+	<p><code>window.requestAnimationFrame()</code> <i>usually</i> runs at 60fps, but on machines with monitors with higher refresh rates it can run as fast as 120fps</p>
+	<p>It can also run <i>slower</i> than 60fps if your JavaScript is doing a lot of drawing on the canvas.</p>
+	<p>ISSUE: because this animation is written so that the sprite moves a fixed amount per frame, the animation will run twice as fast on a 120fps machine than on a 60fps machine.</p>
+</body>
+</html>

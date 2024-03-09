@@ -2,12 +2,21 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Web Audio 2</title>
+	<title>Web Audio 4</title>
 	<style>
 		canvas{border:1px solid black;display:block;}
+		*{font-family:sans-serif;}
+		span{margin-right:2em;}
+		#slider-distortion{position:relative;top:.7em;}
 	</style>
 </head>
 <body>
+<p>
+	<span><label for="cb-highshelf">Highshelf Filter (Treble)</label><input type="checkbox" id="cb-highshelf"></span>
+	<span><label for="cb-lowshelf">Lowshelf Filter (Bass)</label><input type="checkbox" id="cb-lowshelf"></span>
+	<span><label for="cb-distortion">Distortion</label><input type="checkbox" id="cb-distortion"></span>
+	<span>0 <input type="range" min="0" max="100" value="0" id="slider-distortion"> 100</span>
+</p>
 <canvas width="640" height="480"></canvas>
 
 <!-- use obama-oilspill.mp3 or human-voice.mp3 -->
@@ -26,6 +35,14 @@
 	// https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource
 	let sourceNode = audioCtx.createMediaElementSource(audioElement); 
 	
+	// https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode
+	let biquadFilter = audioCtx.createBiquadFilter();
+	biquadFilter.type = "highshelf";
+	// biquadFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+	// biquadFilter.gain.setValueAtTime(20, audioCtx.currentTime);
+
+	let lowShelfBiquadFilter = audioCtx.createBiquadFilter();
+	lowShelfBiquadFilter.type = "lowshelf";
 	// 4 - create a *analyser node*
 	// https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
 	// this gets us real-time frequency and time-domain (i.e. waveform) information
@@ -35,7 +52,9 @@
 	analyserNode.fftSize = NUM_SAMPLES;
 	
 	// 6 - hook up the <audio> element to the analyserNode
-	sourceNode.connect(analyserNode);
+	sourceNode.connect(biquadFilter);
+	biquadFilter.connect(lowShelfBiquadFilter);
+	lowShelfBiquadFilter.connect(analyserNode);
 	
 	// 7 - connect to the destination i.e. the speakers
 	analyserNode.connect(audioCtx.destination);
@@ -59,11 +78,13 @@
 	const PADDING = 4;
 	const MIDDLE_Y = ctx.canvas.height/2;
 	
-	
+	let highshelf = false;
+	let lowshelf = false;
 
+	setupUI();
 	loop();
 	
-	function loop() { 
+function loop() { 
 	  // 9 - this schedules a call to the loop() method in 1/60 second
 	  requestAnimationFrame(loop);
 		
@@ -115,8 +136,46 @@
 	ctx.closePath();
 	ctx.restore();
 
-	}
+} //loop
+
+function setupUI(){
+	// I. set the initial state of the high shelf checkbox
+	document.querySelector('#cb-highshelf').checked = highshelf; // `highshelf` is a boolean we will declare in a second
+	document.querySelector('#cb-lowshelf').checked = lowshelf; // `highshelf` is a boolean we will declare in a second
+
+	// II. change the value of `highshelf` every time the high shelf checkbox changes state
+	document.querySelector('#cb-highshelf').onchange = e => {
+		highshelf = e.target.checked;
+		toggleHighshelf(); // turn on or turn off the filter, depending on the value of `highshelf`!
+	};
+	document.querySelector('#cb-lowshelf').onchange = e => {
+		lowshelf = e.target.checked;
+		toggleLowshelf(); // turn on or turn off the filter, depending on the value of `highshelf`!
+	};
 	
+	// III. 
+	toggleHighshelf(); // when the app starts up, turn on or turn off the filter, depending on the value of `highshelf`!
+	toggleLowshelf();
+}
+
+function toggleHighshelf(){
+	if(highshelf){
+		biquadFilter.frequency.setValueAtTime(1000, audioCtx.currentTime); // we created the `biquadFilter` (i.e. "treble") node last time
+		biquadFilter.gain.setValueAtTime(25, audioCtx.currentTime);
+	}else{
+		biquadFilter.gain.setValueAtTime(0, audioCtx.currentTime);
+	}
+}
+
+function toggleLowshelf(){
+  if(lowshelf){
+    lowShelfBiquadFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+    lowShelfBiquadFilter.gain.setValueAtTime(15, audioCtx.currentTime);
+  }else{
+    lowShelfBiquadFilter.gain.setValueAtTime(0, audioCtx.currentTime);
+  }
+}
+		
 </script>
 </body>
 </html>

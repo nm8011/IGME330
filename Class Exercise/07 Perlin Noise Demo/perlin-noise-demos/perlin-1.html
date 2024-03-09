@@ -1,0 +1,85 @@
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.js" integrity="sha256-u8njNpzE/7fzKRST7Eu38nECKwFREeLMkipUauqgPpY=" crossorigin="anonymous"></script></head>
+<body>
+<canvas id="myCanvas1"></canvas>
+<br><br>
+<canvas id="myCanvas2"></canvas>
+<script>
+/*
+	var simplex = new SimplexNoise(),
+    value2d = simplex.noise2D(x, y),
+    value3d = simplex.noise3D(x, y, z),
+    value4d = simplex.noise4D(x, y, z, w);
+    */
+  const canvasWidth=400,canvasHeight=300;
+  const fps= 12;
+  const simplex = new SimplexNoise();
+
+  const ctx1 = myCanvas1.getContext("2d");
+  ctx1.canvas.width = canvasWidth;
+  ctx1.canvas.height = canvasHeight;
+  
+  const ctx2 = myCanvas2.getContext("2d");
+  ctx2.canvas.width = canvasWidth;
+  ctx2.canvas.height = canvasHeight;
+  
+  let x = 0;
+  let t = 0;
+    
+  loop();
+  
+
+  function loop(){
+  	//requestAnimationFrame(loop);
+  	setTimeout(loop,1000/fps);
+ 	drawRect(ctx1,0,0,canvasWidth,canvasHeight,"rgba(0,0,0,.1)");
+  drawRect(ctx2,0,0,canvasWidth,canvasHeight,"rgba(0,0,0,.1)");
+  	const numPoints = 10;
+  	let step = canvasWidth/numPoints - 1;
+  	const midY = canvasHeight/2;
+  	const padding = step/2;
+  //	for (let i=0;i<numPoints;i++){
+  		let y1 = Math.random() * canvasHeight;
+  		let percent = (simplex.noise2D(t/2, t) + 1) / 2;
+  		let y2 = percent * canvasHeight;
+  		let colorPercent = (simplex.noise2D(t/2, t+100) + 1) / 2;
+  		let sizePercent = (simplex.noise2D(t/2, t+1000) + 1) / 2;
+  		let y3 = sizePercent * canvasHeight;
+  		let step2 = (colorPercent + 1)/2 * 20;
+  		drawRect(ctx1,((x*step)%canvasWidth) + padding,y1,4,4,"green");
+  		drawRect(ctx2,((x*step)%canvasWidth) + padding,sizePercent*canvasHeight,4,4,"red");
+  	  drawCircle(ctx2,((x*step2)%canvasWidth) + padding,y3,40*colorPercent,getCSSColor(sizePercent*255,colorPercent*255,sizePercent*255));
+  		drawCircle(ctx2,((x*step2)%canvasWidth) + padding,y2,20*sizePercent,getCSSColor(colorPercent*255,255-colorPercent*255,colorPercent*128));
+
+  		x += .1;
+  		t += .01;
+  //	}
+  }
+  
+  function drawRect(ctx,x,y,width,height,fillStyle){
+  	ctx.save()
+  	ctx.fillStyle = fillStyle;
+  	ctx.fillRect(x,y,width,height);
+  	ctx.restore();
+  }
+  
+   function drawCircle(ctx,x,y,radius,fillStyle){
+  	ctx.save()
+  	ctx.fillStyle = fillStyle;
+  	ctx.beginPath()
+  	ctx.arc(x,y,radius,0,Math.PI*2);
+  	ctx.closePath();
+  	ctx.fill();
+  	ctx.restore();
+  }
+  
+  function getCSSColor(r,g,b){
+  	return `rgb(${r},${g},${b})`;
+  }
+  
+    
+    
+</script>
+</body>
+</html>

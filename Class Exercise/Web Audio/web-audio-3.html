@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Web Audio 2</title>
+	<title>Web Audio 3</title>
 	<style>
 		canvas{border:1px solid black;display:block;}
 	</style>
@@ -26,6 +26,12 @@
 	// https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource
 	let sourceNode = audioCtx.createMediaElementSource(audioElement); 
 	
+	// https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode
+	let biquadFilter = audioCtx.createBiquadFilter();
+	biquadFilter.type = "highshelf";
+	biquadFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+	biquadFilter.gain.setValueAtTime(20, audioCtx.currentTime);
+
 	// 4 - create a *analyser node*
 	// https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
 	// this gets us real-time frequency and time-domain (i.e. waveform) information
@@ -35,7 +41,8 @@
 	analyserNode.fftSize = NUM_SAMPLES;
 	
 	// 6 - hook up the <audio> element to the analyserNode
-	sourceNode.connect(analyserNode);
+	sourceNode.connect(biquadFilter);
+	biquadFilter.connect(analyserNode);
 	
 	// 7 - connect to the destination i.e. the speakers
 	analyserNode.connect(audioCtx.destination);
