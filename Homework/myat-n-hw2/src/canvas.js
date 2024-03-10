@@ -6,13 +6,12 @@
 	  - and then draw something representative on the canvas
 	  - maybe a better name for this file/module would be *visualizer.js* ?
 */
-
 import * as utils from './utils.js';
+import * as main from './main.js';
 
 let ctx,canvasWidth,canvasHeight,gradient,analyserNode,audioData;
-let flower, flower2;
-let n = 0;
-
+let angle = 0;
+let rotateSpeed = 1;
 const setupCanvas = (canvasElement,analyserNodeRef) =>{
 	// create drawing context
 	ctx = canvasElement.getContext("2d");
@@ -24,10 +23,6 @@ const setupCanvas = (canvasElement,analyserNodeRef) =>{
 	analyserNode = analyserNodeRef;
 	// this is the array where the analyser data will be stored
 	audioData = new Uint8Array(analyserNode.fftSize/2);
-
-    flower = new PhylloFlower(0, canvasWidth * (1/4), canvasHeight/2, 137.5, 4, 60);
-    flower2 = new PhylloFlower(0, canvasWidth * (3/4), canvasHeight/2, 137.5, 4, 60);
-
 }
 
 const draw = (params={}) =>{
@@ -43,18 +38,72 @@ const draw = (params={}) =>{
     ctx.globalAlpha = .1;
     ctx.fillRect(0,0,canvasWidth,canvasHeight);
     ctx.restore();
-		
+    angle += rotateSpeed;
+    if(angle > 500) angle = 10;
 	// 3 - draw gradient
 	if(params.showGradient){
         ctx.save();
+        ctx.translate(canvasWidth / 2, canvasHeight / 2);
+        ctx.rotate(angle);
+        ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
         ctx.fillStyle = gradient;
         ctx.globalAlpha = .3;
         ctx.fillRect(0,0,canvasWidth,canvasHeight);
         ctx.fillStyle = `rgba(184,255,255,.98)`;
         ctx.fillRect(0,0,canvasWidth,canvasHeight);
-
-        ctx.restore();        
+        // angle+=rotateSpeed;
+        ctx.restore();     
     }
+    ctx.save();
+    if(params.showLine){
+        const BAR_WIDTH = 30;
+        const MAX_BAR_HEIGHT = 100;
+        const PADDING = 4;
+        const MIDDLE_Y = canvasHeight/2;
+        ctx.translate(canvasWidth / 2, canvasHeight / 2);
+        ctx.rotate(angle);
+        ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
+        if(!main.play)
+        {
+        ctx.fillStyle = "red";
+        ctx.save();
+        ctx.translate(440, MIDDLE_Y-170);
+        for(let b of audioData){
+            let percent = b/255;
+            if(percent < .02) percent = .02;
+            ctx.translate(BAR_WIDTH, 0);
+            ctx.rotate(Math.PI * 2/32);
+            ctx.save(); //for flip
+            ctx.scale(1,-1);
+            ctx.fillStyle = `rgb(${b},${b-128},${255-b})`;
+            ctx.fillRect(0,0,BAR_WIDTH,MAX_BAR_HEIGHT * percent);
+            ctx.restore();
+            ctx.translate(PADDING,10); //add space between bars
+        }
+        ctx.restore();
+        }
+    
+        ctx.save();
+        ctx.strokeStyle="white";
+        ctx.lineWidth = 3;
+        let x = 0;
+        let y = MIDDLE_Y + 200;
+        ctx.beginPath();
+        if(!main.play)
+        {
+        ctx.moveTo(x,y);
+        for(let b of audioData){
+            //moveTo()s
+            ctx.lineTo(x,y-b);
+            x += (ctx.canvas.width/(audioData.length-10));
+        }
+        ctx.stroke();
+        ctx.closePath();
+     }
+        ctx.restore();
+
+    }
+    ctx.restore();
 	// 4 - draw bars
 	if(params.showBars){
         let barSpacing = 4;
@@ -85,14 +134,15 @@ const draw = (params={}) =>{
             
             //middle circle
             let circleRadius = percent * maxRadius;
-            drawCircle(ctx,circleRadius,0,2,utils.makeColor(255, 111, 111, .34 - percent/3.0));
+            drawCircle(ctx,circleRadius,0,2,utils.makeColor(255, 111, 111, .34 - percent/3.0),);
 
             //purple outer circle
             drawCircle(ctx,circleRadius*1.5,0,2,utils.makeColor(184, 0, 255, .10 - percent/10.0));
 
-            //yellow-ish circles, smaller
+            //red-ish circles, smaller
             drawCircle(ctx,circleRadius*0.5,0,2,utils.makeColor(200, 200, 255, .50 - percent/5.0));
 
+            //white ring outside
             drawCircle(ctx,circleRadius*2,0,2,utils.makeColor(0,0,0,0),"rgba(255,255,255,1)",10);
         }
         ctx.restore();
@@ -141,51 +191,16 @@ const draw = (params={}) =>{
         }
     }
 
-    flower.draw();
-    flower2.draw();
-
 	// D) copy image data back to canvas
     ctx.putImageData(imageData, 0, 0);
+
+    ctx.save();
+    ctx.fillStyle = "black";
+    ctx.globalAlpha = .1;
+    ctx.fillRect(0,0,canvasWidth,canvasHeight);
+    ctx.restore();
 }//end draw()
 
-class PhylloFlower{
-    constructor(n=0, centerX=0, centerY=0, divergence=137.5, c=4, fps=60){
-        this.n = 0; //n should be initialized to 0 in your constructor
-        //The values of the other 4 properties must be passed into the constructor as parameters
-        this.centerX = centerX;
-        this.centerY = centerY;
-        this.divergence = divergence;
-        this.c = c;
-        this.fps = fps;
-    }
-
-    draw(){	//a draw() method that takes a ctx argument
-        let percent = audioData[this.n] / 255;
-        let angle = this.n * this.dtr(this.divergence) * percent;
-        let radius = this.c * Math.sqrt(this.n) * percent;
-        let x = radius * Math.cos(angle) + this.centerX;
-        let y = radius * Math.sin(angle) + this.centerY;
-        let color = `hsl(${this.n/5 % 361},100%,50%)`;
-        this.drawCircle(ctx,x,y,2,color);
-        this.n++;
-    }
-
-    drawCircle(ctx,x,y,radius,color){
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x,y,radius,0,Math.PI * 2);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-    }
-
-    dtr(degrees){ return degrees * (Math.PI/180);}
-    update(){
-        setTimeout(() => this.update,1000/this.fps);
-        draw(ctx);
-    }
-}
 const drawCircle = (ctx,radius,startAngle, endAngle, fillStyle, strokeStyle="red", linewidth=0) =>{
     ctx.save();
     ctx.fillStyle = fillStyle;
@@ -198,5 +213,67 @@ const drawCircle = (ctx,radius,startAngle, endAngle, fillStyle, strokeStyle="red
     ctx.closePath();
     ctx.restore();
 }
+class Coin{
+    spritesheetURL = "./src/coin_spritesheet.png";
+    constructor(ctx, spritesheet, x, y, spriteCount){
+        this.ctx = ctx;
+        this.spritesheet = spritesheet;
+        this.x = x;
+        this.y = y;
+        this.spriteCount = spriteCount;
+        this.frame = 0;
+        this.preloadImage(this.spritesheetURL);
+    }
 
-export {setupCanvas,draw,PhylloFlower};
+    drawRect()
+    {
+        ctx.globalAlpha = .3;
+        ctx.fillStyle = `rgba(184,255,255,.98)`;
+        ctx.fillRect(0,0,100,100);
+        console.log("this happedn");
+    }
+    draw(){
+        //size of sprite
+        const frameWidth = this.spritesheet.width/this.spriteCount;
+        const frameHeight = this.spritesheet.height;
+        this.ctx.drawImage(this.spritesheet,
+            this.frame * this.spritesheet.width, //x of current sprite in spritesheet
+            0, //y
+            frameWidth, //width of sprite
+            frameHeight,
+            this.x, //xPos of where we want the sprite to be
+            this.y,
+            frameWidth,frameHeight);
+    }
+    update(){
+        setTimeout(() => this.update(), 100); // 10 FPS
+        //increment
+        this.frame = (this.frame + 1) % this.spriteCount //will reiterate the spritesheet if frame value is greater than spritecount
+        this.draw();
+    }
+
+    preloadImage(url) {
+        let img = new Image();
+        img.onload = () => {
+            this.spritesheet = img;
+            this.update();
+        };
+        img.src = url;
+    }
+    // coinSpinning = [
+    //     { x: 0, y: 62, w: 30, h: 30 },
+    //     { x: 62, y: 62, w: 30, h: 30 },
+    //     { x: 124, y: 62, w: 30, h: 30 },
+    //     { x: 186, y: 62, w: 30, h: 30 },
+    //     { x: 248, y: 62, w: 30, h: 30 },
+    //     { x: 310, y: 62, w: 30, h: 30 },
+    //     { x: 372, y: 62, w: 30, h: 30 },
+    //     { x: 434, y: 62, w: 30, h: 30 },
+    //     { x: 496, y: 62, w: 30, h: 30 },
+    //     { x: 558, y: 62, w: 30, h: 30 },
+    //     { x: 682, y: 62, w: 30, h: 30 },
+    //     { x: 744, y: 62, w: 30, h: 30 },
+    //     { x: 800, y: 62, w: 30, h: 30 },
+    // ]
+}
+export {setupCanvas,draw, ctx, Coin};

@@ -93,14 +93,11 @@ function loop() {
 	  // 9 - this schedules a call to the loop() method in 1/60 second
 	  requestAnimationFrame(loop);
 		
-	 
-		
 	  // 10 - populate the array with the frequency data
 	  // notice these arrays are passed *by reference*
 	  analyserNode.getByteFrequencyData(data);
 		
 	  // 11 - this time, let's visualize the audio data on the canvas
-		
      	  /* YOU WRITE THIS! */
 	//clear out screen at 10% opacity
 	ctx.fillStyle = "rgba(0,0,0,.1)";

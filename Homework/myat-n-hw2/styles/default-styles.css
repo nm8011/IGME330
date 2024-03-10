@@ -13,6 +13,9 @@ body {
     box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
     background: #fafafa;
   }
+  *{font-family:sans-serif;}
+  span{margin-right:3em;}
+  #slider-distortion{position:relative;top:.7em;}
   
   #controls{
     margin-left: 1rem;

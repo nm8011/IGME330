@@ -2,11 +2,6 @@
 	main.js is primarily responsible for hooking up the UI to the rest of the application 
 	and setting up the main event loop
 */
-
-// We will write the functions in this file in the traditional ES5 way
-// In this instance, we feel the code is more readable if written this way
-// If you want to re-write these as ES6 arrow functions, to be consistent with the other files, go ahead!
-
 import * as utils from './utils.js';
 import * as audio from './audio.js';
 import * as canvas from './canvas.js';
@@ -15,29 +10,35 @@ const drawParams = {
   showGradient  : true,
   showBars      : true,
   showCircles   : true,
+  showLine      : true,
   showNoise     : false,
   showInvert    : false,
   showEmboss    : false
 };
 
-const cbCircles = document.querySelector("#circles-cb");
-const cbBars = document.querySelector("#bars-cb");
-const cbGradient = document.querySelector("#gradient-cb");
-const cbNoise = document.querySelector("#noise-cb");
-const cbInvert = document.querySelector("#invert-colors-cb");
-const cbEmboss = document.querySelector("#emboss-cb");
+//Visualization
+const cbCircles = document.querySelector("#cb-circles");
+const cbBars = document.querySelector("#cb-bars");
+const cbGradient = document.querySelector("#cb-gradient");
+const cbNoise = document.querySelector("#cb-noise");
+const cbInvert = document.querySelector("#cb-invert-colors");
+const cbEmboss = document.querySelector("#cb-emboss");
+const cbLine = document.querySelector("#cb-line");
 
+let coinOne;
+let coinTwo;
+let coinImg;
+let canvasWidth = canvas.canvasWidth;
+let canvasHeight = canvas.canvasHeight;
+let play;
 
 // 1 - here we are faking an enumeration
 const DEFAULTS = Object.freeze({
 	sound1  :  "media/New Adventure Theme.mp3"
 });
 
-
 const init = () =>{
-  audio.setupWebaudio(DEFAULTS.sound1);
-	console.log("init called");
-	console.log(`Testing utils.getRandomColor() import: ${utils.getRandomColor()}`);
+  audio.setupWebaudio(DEFAULTS.sound1); //defaults to first audio track
 	let canvasElement = document.querySelector("canvas"); // hookup <canvas> element
 	setupUI(canvasElement);
 
@@ -45,9 +46,20 @@ const init = () =>{
   cbCircles.checked = true;
   cbBars.checked = true;
   cbGradient.checked = true;
+  cbLine.checked = true;
+
+  const ctx = canvasElement.getContext("2d");
+
+  coinOne = new canvas.Coin(ctx,coinImg,canvasWidth/4,canvasHeight/2, 13);
+  coinTwo = new canvas.Coin(ctx,coinImg,(canvasWidth/4) *3,canvasHeight/2, 13);
+
+  let spritesheetURL = "./src/coin_spritesheet.png";
+  //Setup canvas
 
   canvas.setupCanvas(canvasElement,audio.analyserNode);
   loop();
+  coinOne.preloadImage(spritesheetURL);
+  coinTwo.preloadImage(spritesheetURL);
 }
 
 const setupUI = (canvasElement) =>{
@@ -74,16 +86,18 @@ const setupUI = (canvasElement) =>{
         audio.playCurrentSound();
         e.target.dataset.playing = "yes"; //our CSS will set the text to "Paused"
         //if track is playing, pause it
+        play = false;
     }else{
         audio.pauseCurrentSound();
         e.target.dataset.playing = "no"; //our css will set the text to "Play"
+        play = true;
     }
   };
 
+  //Sliders
   // C - hookup volume slider & label
   let volumeSlider = document.querySelector("#slider-volume");
   let volumeLabel = document.querySelector("#label-volume");
-
   //add .oninput event to slider
   volumeSlider.oninput = e =>{
     //set the gain
@@ -91,7 +105,6 @@ const setupUI = (canvasElement) =>{
     //update value of label to match value of sldier
     volumeLabel.innerHTML = Math.round((e.target.value/2 * 100));
   };
-
   //set value of label to match initial value of slider
   volumeSlider.dispatchEvent(new Event("input"));
 
@@ -107,49 +120,13 @@ const setupUI = (canvasElement) =>{
   };
 
   //Checkboxes
-  cbCircles.onchange = e =>{
-    if(!cbCircles.checked){
-      drawParams.showCircles = false;
-    }else{
-      drawParams.showCircles = true;
-    }
-  }
-  cbBars.onchange = e =>{
-    if(!cbBars.checked){
-      drawParams.showBars = false;
-    }else{
-      drawParams.showBars = true;
-    }
-  }
-  cbGradient.onchange = e =>{
-    if(!cbGradient.checked){
-      drawParams.showGradient = false;
-    }else{
-      drawParams.showGradient = true;
-    }
-  }
-  cbNoise.onchange = e =>{
-    if(!cbNoise.checked){
-      drawParams.showNoise = false;
-    }else{
-      drawParams.showNoise = true;
-    }
-  }
-  cbInvert.onchange = e =>{
-    if(!cbInvert.checked){
-      drawParams.showInvert = false;
-    }else{
-      drawParams.showInvert = true;
-    }
-  }  
-  cbEmboss.onchange = e =>{
-    if(!cbEmboss.checked){
-      drawParams.showEmboss = false;
-    }else{
-      drawParams.showEmboss = true;
-    }
-  }
-
+  cbBars.onchange = e => {drawParams.showBars = utils.toggleCheckbox(cbBars)};
+  cbCircles.onchange = e => {drawParams.showCircles = utils.toggleCheckbox(cbCircles)};
+  cbGradient.onchange = e => {drawParams.showGradient = utils.toggleCheckbox(cbGradient)};
+  cbNoise.onchange = e => {drawParams.showNoise = utils.toggleCheckbox(cbNoise)};
+  cbInvert.onchange = e => {drawParams.showInvert = utils.toggleCheckbox(cbInvert)};
+  cbEmboss.onchange = e => {drawParams.showEmboss = utils.toggleCheckbox(cbEmboss)};
+  cbLine.onchange = e => {drawParams.showLine = utils.toggleCheckbox(cbLine)};
 } // end setupUI
 
 const loop = () =>{
@@ -158,4 +135,4 @@ const loop = () =>{
         canvas.draw(drawParams);
 }
 
-export {init};
+export {init,play};
