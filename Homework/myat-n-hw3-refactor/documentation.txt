@@ -19,3 +19,9 @@ V. Tell us how you improved the aesthetics of the app over the AV HW:
     There was suppose to be a spinning coin to the right and left of the circle
     I would give myself a 14% grade, I couldve definitely made more improvement and made it look more advance according to my skill level
     I could not get the sprite to work no matter what which reveals to me that its something I definitely have to review
+
+HW3 Section
+----------------------------------
+I. tell us what language you coded in
+    I've decided to utilize typescript
+II. for section V. options #2 & #3, describe the code changes you implemented
