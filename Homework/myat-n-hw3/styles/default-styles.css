@@ -1,0 +1,48 @@
+body {
+    background: #b3bde8;
+    font-family: tahoma, verdana, sans serif;
+  }
+  div{
+    font-size: 26px;
+  }
+  
+  canvas {
+    margin-left: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+    background: #fafafa;
+  }
+  *{font-family:sans-serif;}
+  span{margin-right:3em;}
+  #slider-distortion{position:relative;top:.7em;}
+  
+  #controls{
+    margin-left: 1rem;
+  }
+  
+  #label-volume{
+    margin-left: 1rem;
+  }
+  
+  section{
+    margin-bottom: 1rem;
+  }
+  
+  #btn-play{
+    font-size: 1.2rem;
+    width: 6rem;
+  }
+  
+  button[data-playing="yes"]:after{
+    content: "Pause";
+  }
+  
+  button[data-playing="no"]:after{
+    content: "Play";
+  }
+  
+  #btn-fs{
+    font-size: 1.2rem;
+    width: 8rem;
+  }
