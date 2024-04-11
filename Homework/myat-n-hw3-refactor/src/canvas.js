@@ -276,4 +276,4 @@ class Coin{
     //     { x: 800, y: 62, w: 30, h: 30 },
     // ]
 }
-export {setupCanvas,draw, ctx, Coin};
+export {setupCanvas, canvasWidth, canvasHeight, draw, ctx, Coin};
