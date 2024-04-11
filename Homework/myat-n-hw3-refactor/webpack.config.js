@@ -1,6 +1,6 @@
 module.exports = {
     mode: 'development',
-    entry: ['./src/main.js'],
+    entry: ['./src/loader.js'],
     output: {
       filename: './bundle.js'
     }
