@@ -5,7 +5,7 @@
 import * as utils from './utils.js';
 import * as audio from './audio.js';
 import * as canvas from './canvas.js';
-
+import * as nav from './navigation.js';
 const drawParams = {
   showGradient  : true,
   showBars      : true,
@@ -63,6 +63,8 @@ const init = () =>{
 }
 
 const setupUI = (canvasElement) =>{
+  nav.burgerClicked;
+  
   // A - hookup fullscreen button
   const fsButton = document.querySelector("#btn-fs");
 	const playButton = document.querySelector("#btn-play");
