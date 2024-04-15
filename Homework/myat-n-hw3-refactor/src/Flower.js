@@ -1,14 +1,3 @@
-
-const canvasWidth = 640, canvasHeight = 480;
-let n = 0;
-const divergence = 137.5;
-const c = 4;
-
-let ctx;
-let flowerLeft;
-let flowerRight;
-let spriteArray;
-
 export default class PhylloFlower{
     constructor(n=0, centerX=0, centerY=0, divergence=137.5, c=4, fps=30){
         this.n = 0; //n should be initialized to 0 in your constructor
@@ -42,4 +31,3 @@ export default class PhylloFlower{
 
     dtr(degrees){ return degrees * (Math.PI/180);}
 }
-// window.onload = init;

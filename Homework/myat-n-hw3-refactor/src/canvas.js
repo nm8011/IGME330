@@ -25,27 +25,6 @@ const setupCanvas = (canvasElement,analyserNodeRef) =>{
 	// this is the array where the analyser data will be stored
 	audioData = new Uint8Array(analyserNode.fftSize/2);
 }
-const init = () =>{
-    ctx = canvas.getContext("2d");
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    ctx.fillRect(0,0,canvasWidth,canvasHeight);
-    // flowerLeft = new PhylloFlower(0, 200, 200, 137.5, 4, 30);
-    // flowerRight = new PhylloFlower(0, 450, 200, 137.1, 3, 100);
-    // console.log("happens");
-    // spriteArray = [flowerLeft,flowerRight];
-    // for(let i = 0; i < spriteArray.length; i++)
-    // {
-    //     loop(spriteArray[i], spriteArray[i].fps);
-    // }
-}
-
-//pass in object and fps that the objects get drawn
-const loop = (flower, fps) =>{
-    // setTimeout(loop,1000/fps); //doesnt work cuz of argument
-    setTimeout(() => loop(flower,fps),1000/fps);
-    flower.draw(ctx);
-}
 
 const draw = (params={}) =>{
     // 1 - populate the audioData array with the frequency data from the analyserNode
@@ -81,104 +60,19 @@ const draw = (params={}) =>{
         ctx.restore();
     }
     ctx.save();
+    //drawLines
     if(params.showLine){
-        const BAR_WIDTH = 30;
-        const MAX_BAR_HEIGHT = 100;
-        const PADDING = 4;
-        const MIDDLE_Y = canvasHeight/2;
-        ctx.translate(canvasWidth / 2, canvasHeight / 2);
-        ctx.rotate(angle);
-        ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
-        if(!main.play)
-        {
-        ctx.fillStyle = "red";
-        ctx.save();
-        ctx.translate(440, MIDDLE_Y-170);
-        for(let b of audioData){
-            let percent = b/255;
-            if(percent < .02) percent = .02;
-            ctx.translate(BAR_WIDTH, 0);
-            ctx.rotate(Math.PI * 2/32);
-            ctx.save(); //for flip
-            ctx.scale(1,-1);
-            ctx.fillStyle = `rgb(${b},${b-128},${255-b})`;
-            ctx.fillRect(0,0,BAR_WIDTH,MAX_BAR_HEIGHT * percent);
-            ctx.restore();
-            ctx.translate(PADDING,10); //add space between bars
-        }
-        ctx.restore();
-        }
-
-        ctx.save();
-        ctx.strokeStyle="white";
-        ctx.lineWidth = 3;
-        let x = 0;
-        let y = MIDDLE_Y + 200;
-        ctx.beginPath();
-        if(!main.play)
-        {
-        ctx.moveTo(x,y);
-        for(let b of audioData){
-            //moveTo()s
-            ctx.lineTo(x,y-b);
-            x += (ctx.canvas.width/(audioData.length-10));
-        }
-        ctx.stroke();
-        ctx.closePath();
-     }
-        ctx.restore();
-
+       drawLines();
     }
     ctx.restore();
 	// 4 - draw bars
 	if(params.showBars){
-        let barSpacing = 4;
-        let margin = 5;
-        let screenWidthForBars = canvasWidth - (audioData.length * barSpacing) - margin * 2;
-        let barWidth = screenWidthForBars / audioData.length;
-        let barHeight = 200;
-        let topSpacing = 100;
-
-        ctx.save();
-        ctx.fillStyle = 'rgba(255,255,255,0.50)';
-        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-        //loop through the data and draw!
-        for(let i=0; i<audioData.length; i++){
-            ctx.fillRect(margin + i * (barWidth + barSpacing),topSpacing + 256-audioData[i],barWidth,barHeight);
-            ctx.strokeRect(margin + i * (barWidth + barSpacing),topSpacing + 256-audioData[i],barWidth,barHeight);
-        }
-        ctx.restore();
+        drawBars();
     }
 	// 5 - draw circles
 	if(params.showCircles){
-        let maxRadius = canvasHeight/4;
-        ctx.save();
-        ctx.globalAlpha = 0.5;
-        for(let i=0; i<audioData.length; i++){
-            //red-ish circles
-            let percent = audioData[i] / 255;
-
-            //middle circle
-            let circleRadius = percent * maxRadius;
-            drawCircle(ctx,circleRadius,0,2,utils.makeColor(255, 111, 111, .34 - percent/3.0),);
-
-            //purple outer circle
-            drawCircle(ctx,circleRadius*1.5,0,2,utils.makeColor(184, 0, 255, .10 - percent/10.0));
-
-            //red-ish circles, smaller
-            drawCircle(ctx,circleRadius*0.5,0,2,utils.makeColor(200, 200, 255, .50 - percent/5.0));
-
-            //white ring outside
-            drawCircle(ctx,circleRadius*2,0,2,utils.makeColor(0,0,0,0),"rgba(255,255,255,1)",10);
-        }
-        ctx.restore();
+        drawCircles();
     }
-
-    // 6 - bitmap manipulation
-	// TODO: right now. we are looping though every pixel of the canvas (320,000 of them!),
-	// regardless of whether or not we are applying a pixel effect
-	// At some point, refactor this code so that we are looping though the image data only if
-	// it is necessary
 
 	// A) grab all of the pixels on the canvas and put them in the `data` array
 	// `imageData.data` is a `Uint8ClampedArray()` typed array that has 1.28 million elements!
@@ -227,6 +121,71 @@ const draw = (params={}) =>{
     ctx.restore();
 }//end draw()
 
+const drawLines = () =>{
+    const BAR_WIDTH = 30;
+    const MAX_BAR_HEIGHT = 100;
+    const PADDING = 4;
+    const MIDDLE_Y = canvasHeight/2;
+    ctx.translate(canvasWidth / 2, canvasHeight / 2);
+    ctx.rotate(angle);
+    ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
+    if(!main.play)
+    {
+    ctx.fillStyle = "red";
+    ctx.save();
+    ctx.translate(440, MIDDLE_Y-170);
+    for(let b of audioData){
+        let percent = b/255;
+        if(percent < .02) percent = .02;
+        ctx.translate(BAR_WIDTH, 0);
+        ctx.rotate(Math.PI * 2/32);
+        ctx.save(); //for flip
+        ctx.scale(1,-1);
+        ctx.fillStyle = `rgb(${b},${b-128},${255-b})`;
+        ctx.fillRect(0,0,BAR_WIDTH,MAX_BAR_HEIGHT * percent);
+        ctx.restore();
+        ctx.translate(PADDING,10); //add space between bars
+    }
+    ctx.restore();
+    }
+
+    ctx.save();
+    ctx.strokeStyle="white";
+    ctx.lineWidth = 3;
+    let x = 0;
+    let y = MIDDLE_Y + 200;
+    ctx.beginPath();
+    if(!main.play)
+    {
+    ctx.moveTo(x,y);
+    for(let b of audioData){
+        //moveTo()s
+        ctx.lineTo(x,y-b);
+        x += (ctx.canvas.width/(audioData.length-10));
+    }
+    ctx.stroke();
+    ctx.closePath();
+ }
+    ctx.restore();
+}
+const drawBars = () =>{
+    let barSpacing = 4;
+    let margin = 5;
+    let screenWidthForBars = canvasWidth - (audioData.length * barSpacing) - margin * 2;
+    let barWidth = screenWidthForBars / audioData.length;
+    let barHeight = 200;
+    let topSpacing = 100;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.50)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    //loop through the data and draw!
+    for(let i=0; i<audioData.length; i++){
+        ctx.fillRect(margin + i * (barWidth + barSpacing),topSpacing + 256-audioData[i],barWidth,barHeight);
+        ctx.strokeRect(margin + i * (barWidth + barSpacing),topSpacing + 256-audioData[i],barWidth,barHeight);
+    }
+    ctx.restore();
+}
 const drawCircle = (ctx,radius,startAngle, endAngle, fillStyle, strokeStyle="red", linewidth=0) =>{
     ctx.save();
     ctx.fillStyle = fillStyle;
@@ -239,16 +198,48 @@ const drawCircle = (ctx,radius,startAngle, endAngle, fillStyle, strokeStyle="red
     ctx.closePath();
     ctx.restore();
 }
+const drawCircles = () =>{
+    let maxRadius = canvasHeight/4;
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    for(let i=0; i<audioData.length; i++){
+        //red-ish circles
+        let percent = audioData[i] / 255;
+
+        //middle circle
+        let circleRadius = percent * maxRadius;
+        drawCircle(ctx,circleRadius,0,2,utils.makeColor(255, 111, 111, .34 - percent/3.0),);
+
+        //purple outer circle
+        drawCircle(ctx,circleRadius*1.5,0,2,utils.makeColor(184, 0, 255, .10 - percent/10.0));
+
+        //red-ish circles, smaller
+        drawCircle(ctx,circleRadius*0.5,0,2,utils.makeColor(200, 200, 255, .50 - percent/5.0));
+
+        //white ring outside
+        drawCircle(ctx,circleRadius*2,0,2,utils.makeColor(0,0,0,0),"rgba(255,255,255,1)",10);
+    }
+    ctx.restore();
+}
 
 const drawFlower = () =>{
-    const flowerLeft = new PhylloFlower(0, 200, 200, 137.5, 4, 30);
-    const flowerRight = new PhylloFlower(0, 450, 200, 137.1, 3, 100);
-    console.log("happens");
+    const flowerLeft = new PhylloFlower(0, canvasWidth/4, canvasHeight/2, 137.5, 4, 30);
+    const flowerRight = new PhylloFlower(0, canvasWidth/4*3 , canvasHeight/2, 137.1, 3, 100);
     const spriteArray = [flowerLeft,flowerRight];
     for(let i = 0; i < spriteArray.length; i++)
     {
         loop(spriteArray[i], spriteArray[i].fps);
     }
+    // for(let i=0; i<audioData.length; i++){
+    //     flowerLeft.divergence = i%255;
+    // }
+
+}
+//pass in object and fps that the objects get drawn
+const loop = (flower, fps) =>{
+    // setTimeout(loop,1000/fps); //doesnt work cuz of argument
+    setTimeout(() => loop(flower,fps),1000/fps);
+    flower.draw(ctx);
 }
 
 export {setupCanvas, canvasWidth, canvasHeight, draw, ctx};
