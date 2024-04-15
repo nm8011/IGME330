@@ -1,6 +1,6 @@
 /*
-	The purpose of this file is to take in the analyser node and a <canvas> element: 
-	  - the module will create a drawing context that points at the <canvas> 
+	The purpose of this file is to take in the analyser node and a <canvas> element:
+	  - the module will create a drawing context that points at the <canvas>
 	  - it will store the reference to the analyser node
 	  - in draw(), it will loop through the data in the analyser node
 	  - and then draw something representative on the canvas
@@ -8,6 +8,7 @@
 */
 import * as utils from './utils.js';
 import * as main from './main.js';
+import PhylloFlower from './Flower.js';
 
 let ctx,canvasWidth,canvasHeight,gradient,analyserNode,audioData;
 let angle = 0;
@@ -24,20 +25,45 @@ const setupCanvas = (canvasElement,analyserNodeRef) =>{
 	// this is the array where the analyser data will be stored
 	audioData = new Uint8Array(analyserNode.fftSize/2);
 }
+const init = () =>{
+    ctx = canvas.getContext("2d");
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    ctx.fillRect(0,0,canvasWidth,canvasHeight);
+    // flowerLeft = new PhylloFlower(0, 200, 200, 137.5, 4, 30);
+    // flowerRight = new PhylloFlower(0, 450, 200, 137.1, 3, 100);
+    // console.log("happens");
+    // spriteArray = [flowerLeft,flowerRight];
+    // for(let i = 0; i < spriteArray.length; i++)
+    // {
+    //     loop(spriteArray[i], spriteArray[i].fps);
+    // }
+}
+
+//pass in object and fps that the objects get drawn
+const loop = (flower, fps) =>{
+    // setTimeout(loop,1000/fps); //doesnt work cuz of argument
+    setTimeout(() => loop(flower,fps),1000/fps);
+    flower.draw(ctx);
+}
 
 const draw = (params={}) =>{
-  // 1 - populate the audioData array with the frequency data from the analyserNode
-	// notice these arrays are passed "by reference" 
+    // 1 - populate the audioData array with the frequency data from the analyserNode
+	// notice these arrays are passed "by reference"
     analyserNode.getByteFrequencyData(audioData);
     // OR
 	//analyserNode.getByteTimeDomainData(audioData); // waveform data
-	
+
 	// 2 - draw background
 	ctx.save();
     ctx.fillStyle = "black";
     ctx.globalAlpha = .1;
     ctx.fillRect(0,0,canvasWidth,canvasHeight);
     ctx.restore();
+
+    //Draw Flower
+    drawFlower();
+
     angle += rotateSpeed;
     if(angle > 500) angle = 10;
 	// 3 - draw gradient
@@ -52,7 +78,7 @@ const draw = (params={}) =>{
         ctx.fillStyle = `rgba(184,255,255,.98)`;
         ctx.fillRect(0,0,canvasWidth,canvasHeight);
         // angle+=rotateSpeed;
-        ctx.restore();     
+        ctx.restore();
     }
     ctx.save();
     if(params.showLine){
@@ -82,7 +108,7 @@ const draw = (params={}) =>{
         }
         ctx.restore();
         }
-    
+
         ctx.save();
         ctx.strokeStyle="white";
         ctx.lineWidth = 3;
@@ -131,7 +157,7 @@ const draw = (params={}) =>{
         for(let i=0; i<audioData.length; i++){
             //red-ish circles
             let percent = audioData[i] / 255;
-            
+
             //middle circle
             let circleRadius = percent * maxRadius;
             drawCircle(ctx,circleRadius,0,2,utils.makeColor(255, 111, 111, .34 - percent/3.0),);
@@ -149,14 +175,14 @@ const draw = (params={}) =>{
     }
 
     // 6 - bitmap manipulation
-	// TODO: right now. we are looping though every pixel of the canvas (320,000 of them!), 
+	// TODO: right now. we are looping though every pixel of the canvas (320,000 of them!),
 	// regardless of whether or not we are applying a pixel effect
 	// At some point, refactor this code so that we are looping though the image data only if
 	// it is necessary
 
 	// A) grab all of the pixels on the canvas and put them in the `data` array
 	// `imageData.data` is a `Uint8ClampedArray()` typed array that has 1.28 million elements!
-	// the variable `data` below is a reference to that array 
+	// the variable `data` below is a reference to that array
 	let imageData = ctx.getImageData(0,0,canvasWidth,canvasHeight);
     let data = imageData.data;
     let length = data.length;
@@ -181,7 +207,7 @@ const draw = (params={}) =>{
             data[i+2] = 255 - blue;
             //data[i+3] is the alpha, but we're leaving that alone
         }
-        
+
 	} // end for
 
     if(params.showEmboss){
@@ -213,67 +239,16 @@ const drawCircle = (ctx,radius,startAngle, endAngle, fillStyle, strokeStyle="red
     ctx.closePath();
     ctx.restore();
 }
-class Coin{
-    spritesheetURL = "./src/coin_spritesheet.png";
-    constructor(ctx, spritesheet, x, y, spriteCount){
-        this.ctx = ctx;
-        this.spritesheet = spritesheet;
-        this.x = x;
-        this.y = y;
-        this.spriteCount = spriteCount;
-        this.frame = 0;
-        this.preloadImage(this.spritesheetURL);
-    }
 
-    drawRect()
+const drawFlower = () =>{
+    const flowerLeft = new PhylloFlower(0, 200, 200, 137.5, 4, 30);
+    const flowerRight = new PhylloFlower(0, 450, 200, 137.1, 3, 100);
+    console.log("happens");
+    const spriteArray = [flowerLeft,flowerRight];
+    for(let i = 0; i < spriteArray.length; i++)
     {
-        ctx.globalAlpha = .3;
-        ctx.fillStyle = `rgba(184,255,255,.98)`;
-        ctx.fillRect(0,0,100,100);
-        console.log("this happedn");
+        loop(spriteArray[i], spriteArray[i].fps);
     }
-    draw(){
-        //size of sprite
-        const frameWidth = this.spritesheet.width/this.spriteCount;
-        const frameHeight = this.spritesheet.height;
-        this.ctx.drawImage(this.spritesheet,
-            this.frame * this.spritesheet.width, //x of current sprite in spritesheet
-            0, //y
-            frameWidth, //width of sprite
-            frameHeight,
-            this.x, //xPos of where we want the sprite to be
-            this.y,
-            frameWidth,frameHeight);
-    }
-    update(){
-        setTimeout(() => this.update(), 100); // 10 FPS
-        //increment
-        this.frame = (this.frame + 1) % this.spriteCount //will reiterate the spritesheet if frame value is greater than spritecount
-        this.draw();
-    }
-
-    preloadImage(url) {
-        let img = new Image();
-        img.onload = () => {
-            this.spritesheet = img;
-            this.update();
-        };
-        img.src = url;
-    }
-    // coinSpinning = [
-    //     { x: 0, y: 62, w: 30, h: 30 },
-    //     { x: 62, y: 62, w: 30, h: 30 },
-    //     { x: 124, y: 62, w: 30, h: 30 },
-    //     { x: 186, y: 62, w: 30, h: 30 },
-    //     { x: 248, y: 62, w: 30, h: 30 },
-    //     { x: 310, y: 62, w: 30, h: 30 },
-    //     { x: 372, y: 62, w: 30, h: 30 },
-    //     { x: 434, y: 62, w: 30, h: 30 },
-    //     { x: 496, y: 62, w: 30, h: 30 },
-    //     { x: 558, y: 62, w: 30, h: 30 },
-    //     { x: 682, y: 62, w: 30, h: 30 },
-    //     { x: 744, y: 62, w: 30, h: 30 },
-    //     { x: 800, y: 62, w: 30, h: 30 },
-    // ]
 }
-export {setupCanvas, canvasWidth, canvasHeight, draw, ctx, Coin};
+
+export {setupCanvas, canvasWidth, canvasHeight, draw, ctx};
