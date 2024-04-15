@@ -114,14 +114,13 @@ const draw = (params={}) =>{
 const drawGradient = () =>{
      ctx.save();
         ctx.translate(canvasWidth / 2, canvasHeight / 2);
-        ctx.rotate(angle);
+        // ctx.rotate(angle);
         ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
         ctx.fillStyle = gradient;
         ctx.globalAlpha = .3;
         ctx.fillRect(0,0,canvasWidth,canvasHeight);
         ctx.fillStyle = `rgba(184,255,255,.98)`;
         ctx.fillRect(0,0,canvasWidth,canvasHeight);
-        // angle+=rotateSpeed;
         ctx.restore();
 }
 const drawLines = () =>{
@@ -225,8 +224,8 @@ const drawCircles = () =>{
 }
 
 const drawFlower = () =>{
-    const flowerLeft = new PhylloFlower(0, canvasWidth/4, canvasHeight/2, 137.5, 4, 30);
-    const flowerRight = new PhylloFlower(0, canvasWidth/4*3 , canvasHeight/2, 137.1, 3, 100);
+    const flowerLeft = new PhylloFlower(0, canvasWidth/4, canvasHeight/2, 137.5, 4, 40);
+    const flowerRight = new PhylloFlower(0, canvasWidth/4*3 , canvasHeight/2, 137.1, 3, 60);
     const spriteArray = [flowerLeft,flowerRight];
     for(let i = 0; i < spriteArray.length; i++)
     {
@@ -237,7 +236,9 @@ const drawFlower = () =>{
 const loop = (flower, fps) =>{
     // setTimeout(loop,1000/fps); //doesnt work cuz of argument
     setTimeout(() => loop(flower,fps),1000/fps);
-    flower.draw(ctx);    
+    if(!main.play){
+        flower.draw(ctx);
+    }
 }
 
 export {setupCanvas, canvasWidth, canvasHeight, draw, ctx};

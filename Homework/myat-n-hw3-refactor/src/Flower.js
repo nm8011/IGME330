@@ -7,6 +7,7 @@ export default class PhylloFlower{
         this.divergence = divergence;
         this.c = c;
         this.fps = fps;
+        let newX=0, newY=0;
     }
 
     draw(ctx){	//a draw() method that takes a ctx argument

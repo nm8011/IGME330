@@ -25,7 +25,7 @@ const cbInvert = document.querySelector("#cb-invert-colors");
 const cbEmboss = document.querySelector("#cb-emboss");
 const cbLine = document.querySelector("#cb-line");
 
-let play;
+let play = "no";
 
 // 1 - here we are faking an enumeration
 const DEFAULTS = Object.freeze({

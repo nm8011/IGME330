@@ -18,7 +18,7 @@
         "The Play/Pause button plays and pause the music",
         "The Full Screen button makes the canvas the full screen, Press ESC to exit",
         "The Track Select options allows you to change tracks",
-        "The Show Spinning Gradient toggles the background color to be a rainbow gradient",
+        "The Show Gradient toggles the background rainbow gradient",
         "The Show Bars toggles the bars that moves according to audio",
         "The Show Circles toggles a circular pulsing that is based on the audio",
         "The Show Spinning Line toggles a staticy line that changes according to the audio and a circular bar",
