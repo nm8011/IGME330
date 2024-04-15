@@ -15,7 +15,7 @@ let angle = 0;
 let rotateSpeed = 1;
 const setupCanvas = (canvasElement,analyserNodeRef) =>{
 	// create drawing context
-	ctx = canvasElement.getContext("2d");
+	ctx = canvasElement.getContext("2d", {willReadFrequently: true});
 	canvasWidth = canvasElement.width;
 	canvasHeight = canvasElement.height;
 	// create a gradient that runs top to bottom
@@ -47,17 +47,7 @@ const draw = (params={}) =>{
     if(angle > 500) angle = 10;
 	// 3 - draw gradient
 	if(params.showGradient){
-        ctx.save();
-        ctx.translate(canvasWidth / 2, canvasHeight / 2);
-        ctx.rotate(angle);
-        ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
-        ctx.fillStyle = gradient;
-        ctx.globalAlpha = .3;
-        ctx.fillRect(0,0,canvasWidth,canvasHeight);
-        ctx.fillStyle = `rgba(184,255,255,.98)`;
-        ctx.fillRect(0,0,canvasWidth,canvasHeight);
-        // angle+=rotateSpeed;
-        ctx.restore();
+       drawGradient();
     }
     ctx.save();
     //drawLines
@@ -121,6 +111,19 @@ const draw = (params={}) =>{
     ctx.restore();
 }//end draw()
 
+const drawGradient = () =>{
+     ctx.save();
+        ctx.translate(canvasWidth / 2, canvasHeight / 2);
+        ctx.rotate(angle);
+        ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
+        ctx.fillStyle = gradient;
+        ctx.globalAlpha = .3;
+        ctx.fillRect(0,0,canvasWidth,canvasHeight);
+        ctx.fillStyle = `rgba(184,255,255,.98)`;
+        ctx.fillRect(0,0,canvasWidth,canvasHeight);
+        // angle+=rotateSpeed;
+        ctx.restore();
+}
 const drawLines = () =>{
     const BAR_WIDTH = 30;
     const MAX_BAR_HEIGHT = 100;
@@ -203,7 +206,6 @@ const drawCircles = () =>{
     ctx.save();
     ctx.globalAlpha = 0.5;
     for(let i=0; i<audioData.length; i++){
-        //red-ish circles
         let percent = audioData[i] / 255;
 
         //middle circle
@@ -230,16 +232,12 @@ const drawFlower = () =>{
     {
         loop(spriteArray[i], spriteArray[i].fps);
     }
-    // for(let i=0; i<audioData.length; i++){
-    //     flowerLeft.divergence = i%255;
-    // }
-
 }
 //pass in object and fps that the objects get drawn
 const loop = (flower, fps) =>{
     // setTimeout(loop,1000/fps); //doesnt work cuz of argument
     setTimeout(() => loop(flower,fps),1000/fps);
-    flower.draw(ctx);
+    flower.draw(ctx);    
 }
 
 export {setupCanvas, canvasWidth, canvasHeight, draw, ctx};

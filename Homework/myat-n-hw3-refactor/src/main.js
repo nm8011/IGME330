@@ -43,7 +43,7 @@ const init = () =>{
   cbGradient.checked = true;
   cbLine.checked = true;
 
-  const ctx = canvasElement.getContext("2d");
+  const ctx = canvasElement.getContext("2d", {willReadFrequently: true});
     // //Setup canvas
   canvas.setupCanvas(canvasElement,audio.analyserNode);
   loop();
