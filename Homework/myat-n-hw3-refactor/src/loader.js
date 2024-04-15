@@ -44,7 +44,7 @@ window.onload = ()=>{
 				html += `<li>${features[i]}</li>`
 			}
 			html += `</ul>`;
-			console.log(features);
+			// console.log(features);
 
 			qsDescription.innerHTML = html;
         };

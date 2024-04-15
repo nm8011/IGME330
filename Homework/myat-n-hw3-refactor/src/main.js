@@ -25,9 +25,9 @@ const cbInvert = document.querySelector("#cb-invert-colors");
 const cbEmboss = document.querySelector("#cb-emboss");
 const cbLine = document.querySelector("#cb-line");
 
-let coinOne;
-let coinTwo;
-let coinImg;
+// let coinOne;
+// let coinTwo;
+// let coinImg;
 let canvasWidth = canvas.canvasWidth;
 let canvasHeight = canvas.canvasHeight;
 let play;
@@ -49,17 +49,17 @@ const init = () =>{
   cbLine.checked = true;
 
   const ctx = canvasElement.getContext("2d");
-
-  coinOne = new canvas.Coin(ctx,coinImg,canvasWidth/4,canvasHeight/2, 13);
-  coinTwo = new canvas.Coin(ctx,coinImg,(canvasWidth/4) *3,canvasHeight/2, 13);
-
-  let spritesheetURL = "./src/coin_spritesheet.png";
-  //Setup canvas
-
+    // //Setup canvas
   canvas.setupCanvas(canvasElement,audio.analyserNode);
   loop();
-  coinOne.preloadImage(spritesheetURL);
-  coinTwo.preloadImage(spritesheetURL);
+
+  // coinOne = new canvas.Coin(ctx,coinImg,canvasWidth/4,canvasHeight/2, 13);
+  // coinTwo = new canvas.Coin(ctx,coinImg,(canvasWidth/4) *3,canvasHeight/2, 13);
+
+  // let spritesheetURL = "./src/coin_spritesheet.png";
+
+  // coinOne.preloadImage(spritesheetURL);
+  // coinTwo.preloadImage(spritesheetURL);
 }
 
 const setupUI = (canvasElement) =>{
