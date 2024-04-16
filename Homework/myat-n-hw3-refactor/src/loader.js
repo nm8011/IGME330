@@ -1,6 +1,4 @@
 import * as main from "./main.js";
-window.onload = ()=>{
-	console.log("window.onload called");
 	// 1 - do preload here - load fonts, images, additional sounds, etc...
 	const loadJsonXHR = () =>{
         const url = "data/av-data.json";
@@ -26,7 +24,7 @@ window.onload = ()=>{
 
 			//Title of App
 			document.querySelector("#title").innerHTML = title;
-			document.querySelector("#titleName").innerHTML = title;
+			document.querySelector("#title-name").innerHTML = title;
 
 			//File Names
 			const qsFile = document.querySelector("#select-track");
@@ -57,4 +55,3 @@ window.onload = ()=>{
 
 	// 2 - start up app
 	main.init();
-}

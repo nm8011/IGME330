@@ -23,5 +23,11 @@ V. Tell us how you improved the aesthetics of the app over the AV HW:
 HW3 Section
 ----------------------------------
 I. tell us what language you coded in
-    I've decided to utilize typescript
+    I've decided to utilize typescript(could not finish)
+    html and js
 II. for section V. options #2 & #3, describe the code changes you implemented
+    I chose option 1 as I struggled with typescript on the verge of almost getting it.
+    I converted all the functions to arrow functions
+    I fixed the sprite that I didnt do in the last hw2
+    Fixed tremble and bass.
+    rename non-conventional id names
