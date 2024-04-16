@@ -50,7 +50,7 @@ const init = () =>{
 }
 
 const setupUI = (canvasElement) =>{
-  nav.burgerClicked();
+  nav.burgerClicked;
   
   // A - hookup fullscreen button
   const fsButton = document.querySelector("#btn-fs");

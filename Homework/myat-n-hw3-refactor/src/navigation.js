@@ -7,5 +7,6 @@
       navbarMenu.classList.toggle('is-active');
     });
   }
+  burgerClicked();
   export{burgerClicked};
 

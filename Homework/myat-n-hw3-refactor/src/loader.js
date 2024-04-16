@@ -39,11 +39,11 @@ window.onload = ()=>{
 			const qsDescription = document.querySelector("#description");
 			let html = `${description}\n`;
 
-			html += `<ul>`;
+			// html += `<ul>`;
 			for(let i=0; i<features.length; i++){
 				html += `<li>${features[i]}</li>`
 			}
-			html += `</ul>`;
+			// html += `</ol>`;
 			// console.log(features);
 
 			qsDescription.innerHTML = html;
