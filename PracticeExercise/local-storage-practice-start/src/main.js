@@ -43,11 +43,11 @@ addButton.addEventListener('click', () => {
 });
 
 // When the page loads:
-showItems();
 // - load in the `items` array from storage.js and display the current items
 // you might want to double-check that you loaded an array ...
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 // ... and if you didn't, set `items` to an empty array
+showItems();
 
 // Got it working? 
 // - Add a "Clear List" button that empties the items array
