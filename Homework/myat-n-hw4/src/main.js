@@ -7,7 +7,8 @@ import * as storage from "./storage.js"
 const lnglatNYS = [-75.71615970715911, 43.025810763917775];
 const lnglatUSA = [-98.5696, 39.8282];
 let geojson;
-let favoriteIds = ["p20","p79","p180","p43"];
+// let favoriteIds = ["p20","p79","p180","p43"];
+let favoriteIds = storage.readFromLocalStorage("nm8011-fav-park") || []; //get item from local storage
 
 // II. Functions
 const reindexArray = () =>{
@@ -35,8 +36,15 @@ const setupUI = () => {
 		map.flyTo(lnglatUSA);
 		// console.log("this happened");
 	};
-
 	refreshFavorites();
+}
+const toLocal = () =>{
+	let items = [];
+	favoriteIds.forEach(id => {
+		items.push(id);
+	});
+	storage.writeToLocalStorage("nm8011-fav-park", items);
+
 }
 const showFeatureDetails = (id) =>{
 	console.log(`showFeatureDetails - id=${id}`);
@@ -62,6 +70,7 @@ const showFeatureDetails = (id) =>{
 
 	checkAdd(feature);
 	checkDelete(feature);
+	toLocal();
 }
 const checkAdd = (feature) =>{
 	//Add FavPark
@@ -75,6 +84,7 @@ const checkAdd = (feature) =>{
 		changeDetail2Info(feature);
 		console.log("Added " + feature.properties.title);
 		checkDelete(feature);
+		toLocal();
 	};
 }
 const checkDelete = (feature) =>{
@@ -86,6 +96,7 @@ const checkDelete = (feature) =>{
 		changeDetail2Info(feature);
 		console.log("Deleted " + feature.properties.title);
 		checkAdd(feature);
+		toLocal();
 	};
 }
 const favIndex = (id) =>{
