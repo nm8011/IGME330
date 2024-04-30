@@ -1,5 +1,6 @@
 import * as map from "./map.js";
 import * as ajax from "./ajax.js";
+import * as storage from "./storage.js"
 
 // I. Variables & constants
 // NB - it's easy to get [longitude,latitude] coordinates with this tool: http://geojson.io/
@@ -9,6 +10,9 @@ let geojson;
 let favoriteIds = ["p20","p79","p180","p43"];
 
 // II. Functions
+const reindexArray = () =>{
+	favoriteIds = favoriteIds.filter(val =>{return val !== undefined;})
+}
 const setupUI = () => {
 	// NYS Zoom 5.2
 	document.querySelector("#btn1").onclick = () => {
@@ -45,16 +49,107 @@ const showFeatureDetails = (id) =>{
 	// the website must be a clickable link
 	// the phone number must also be a clickable link - use the tel: protocol - google it if you are not familiar with how to use it
 	// Get #details-3 displaying the clicked park's description
+
+	let html = addButtonToInfo(feature.id);
 	document.querySelector("#details-2").innerHTML = `
 	<b>Address:</b> ${feature.properties.address}<br>
 	<b>Phone:</b> 
 		<a href="tel:${feature.properties.phone}">${feature.properties.phone}</a><br>
 	<b>Website:</b> 
 		<a href="${feature.properties.url}">${feature.properties.url}</a><br>
+		${html};
+		`;
+
+	checkAdd(feature);
+	checkDelete(feature);
+}
+const checkAdd = (feature) =>{
+	//Add FavPark
+	document.querySelector("#btn-add-fav").onclick = () =>{
+		let contains = checkFavForId(feature.id);
+		if(contains != true){
+			if(feature.id)
+			favoriteIds.push(feature.id);
+		}
+		refreshFavorites();
+		changeDetail2Info(feature);
+		console.log("Added " + feature.properties.title);
+		checkDelete(feature);
+	};
+}
+const checkDelete = (feature) =>{
+	//Delete FavPark
+	document.querySelector("#btn-delete-fav").onclick = () =>{
+		let index = favIndex(feature.id);
+		delete favoriteIds[index];
+		refreshFavorites();
+		changeDetail2Info(feature);
+		console.log("Deleted " + feature.properties.title);
+		checkAdd(feature);
+	};
+}
+const favIndex = (id) =>{
+	for(let i=0; i< favoriteIds.length; i++)
+	{
+		if(id == favoriteIds[i])
+		{
+			return i;
+		}
+	}
+}
+const changeDetail2Info = (feature) => {
+	let html = addButtonToInfo(feature.id);
+	document.querySelector("#details-2").innerHTML = `
+	<b>Address:</b> ${feature.properties.address}<br>
+	<b>Phone:</b> 
+		<a href="tel:${feature.properties.phone}">${feature.properties.phone}</a><br>
+	<b>Website:</b> 
+		<a href="${feature.properties.url}">${feature.properties.url}</a><br>
+		${html};
+		`;
+}
+const checkFavForId = (id) =>{
+	let isFav = false;
+	favoriteIds.forEach(fav => {
+		if(id == fav)
+		{
+			// console.log(`${id} is ${fav}`);
+			isFav = true;
+		}
+	});	
+	return isFav;
+}
+const addButtonToInfo = (id) => {
+	//Enable/Disable AddFavorite and DeleteFavorite
+	const alreadyFavorite = `
+	<button class="has-text-white has-background-success-light"id="btn-add-fav">
+		<i class="fas fa-check"></i>
+		Favorite
+	</button>
+	<button class="has-text-black has-background-warning" id="btn-delete-fav">
+		Delete
+		<i class="fas fa-times"></i>
+	</button>
 	`;
-
-	document.querySelector("#details-3").innerHTML = `${feature.properties.description}`;
-
+	const favorite = `
+	<button class="has-text-white has-background-success"id="btn-add-fav">
+		<i class="fas fa-check"></i>
+		Favorite
+	</button>
+	<button class="has-text-black has-background-warning-light" id="btn-delete-fav">
+		Delete
+		<i class="fas fa-times"></i>
+	</button>
+	`;
+	let html = "";
+	let isFav = checkFavForId(id);
+	if(isFav == true){
+		html = alreadyFavorite;
+	}
+	if(isFav == false){
+		html = favorite;
+	}
+	return html;
 }
 const getFeatureById = (id) =>{
 	//TASK
@@ -73,6 +168,7 @@ const getFeatureById = (id) =>{
 const refreshFavorites = () =>{
 	const favoritesContainer = document.querySelector("#favorites-list");
 	favoritesContainer.innerHTML = "";
+	reindexArray();
 	for(const id of favoriteIds){
 		favoritesContainer.appendChild(createFavoriteElement(id));
 	};
@@ -92,6 +188,7 @@ const createFavoriteElement = (id) =>{
 	<span class="panel-icon">
 		<i class="fas fa-map-pin"></i>
 	</span>
+	
 	${feature.properties.title}
 	`;
 	return a;
